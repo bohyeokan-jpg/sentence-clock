@@ -72,8 +72,11 @@ class _PortraitBody extends StatelessWidget {
         // The gaps above the clock (and between clock and quote) are sized
         // from the screen height only, never from the quote's own height —
         // so the clock's position stays put as quotes of different lengths
-        // rotate through every minute. Only the gap below the quote (an
-        // Expanded) absorbs the difference, nudging the footer instead.
+        // rotate through every minute. The quote itself lives in the one
+        // Expanded slot below, whose height is therefore also fixed per
+        // screen size; a FittedBox shrinks the quote (text size, not the
+        // clock or footer) down to fit that slot instead of growing past
+        // it, so long quotes get smaller words rather than moving anything.
         final topGap = constraints.maxHeight * 0.09;
         final clockToQuoteGap = constraints.maxHeight * 0.055;
         final bottomMargin = constraints.maxHeight * 0.03;
@@ -86,13 +89,22 @@ class _PortraitBody extends StatelessWidget {
                   SizedBox(height: topGap),
                   ClockWidget(ink: palette.ink, accent: palette.accent, faceFill: palette.background, shape: clockShape),
                   SizedBox(height: clockToQuoteGap),
-                  _QuoteBlock(
-                    palette: palette,
-                    quoteState: quoteState,
-                    align: CrossAxisAlignment.center,
-                    textAlign: TextAlign.center,
+                  Expanded(
+                    child: Center(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: SizedBox(
+                          width: constraints.maxWidth,
+                          child: _QuoteBlock(
+                            palette: palette,
+                            quoteState: quoteState,
+                            align: CrossAxisAlignment.center,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                  const Expanded(child: SizedBox()),
                   _FooterNote(palette: palette),
                   SizedBox(height: bottomMargin),
                 ],
