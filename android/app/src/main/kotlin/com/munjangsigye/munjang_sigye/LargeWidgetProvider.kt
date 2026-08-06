@@ -4,8 +4,12 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.BitmapFactory
+import android.os.Bundle
+import android.util.TypedValue
+import android.view.View
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
+import es.antonborri.home_widget.HomeWidgetPlugin
 import es.antonborri.home_widget.HomeWidgetProvider
 
 class LargeWidgetProvider : HomeWidgetProvider() {
@@ -15,23 +19,56 @@ class LargeWidgetProvider : HomeWidgetProvider() {
         appWidgetIds: IntArray,
         widgetData: SharedPreferences,
     ) {
+        appWidgetIds.forEach { widgetId ->
+            apply(context, appWidgetManager, widgetId, widgetData, appWidgetManager.getAppWidgetOptions(widgetId))
+        }
+    }
+
+    override fun onAppWidgetOptionsChanged(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int,
+        newOptions: Bundle,
+    ) {
+        super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
+        apply(context, appWidgetManager, appWidgetId, HomeWidgetPlugin.getData(context), newOptions)
+    }
+
+    private fun apply(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        widgetId: Int,
+        widgetData: SharedPreferences,
+        options: Bundle,
+    ) {
         val quote = widgetData.getString("widget_quote", null) ?: "문장을 불러오는 중이에요"
         val attribution = widgetData.getString("widget_attribution", null) ?: ""
         val clockImagePath = widgetData.getString("widget_clock_image", null)
+        val heightDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 180)
 
-        appWidgetIds.forEach { widgetId ->
-            val views = RemoteViews(context.packageName, R.layout.widget_large).apply {
-                setOnClickPendingIntent(
-                    R.id.widget_root,
-                    HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java),
-                )
-                setTextViewText(R.id.widget_quote, quote)
-                setTextViewText(R.id.widget_attribution, attribution)
-                clockImagePath
-                    ?.let { BitmapFactory.decodeFile(it) }
-                    ?.let { setImageViewBitmap(R.id.widget_clock_image, it) }
-            }
-            appWidgetManager.updateAppWidget(widgetId, views)
+        // Same idea as the medium widget: a taller tile shows more of the
+        // quote (and eventually the attribution line) instead of clipping
+        // it, rather than leaving the extra room empty.
+        val (maxLines, textSizeSp, showAttribution) = when {
+            heightDp < 120 -> Triple(1, 13f, false)
+            heightDp < 200 -> Triple(2, 14f, true)
+            else -> Triple(5, 16f, true)
         }
+
+        val views = RemoteViews(context.packageName, R.layout.widget_large).apply {
+            setOnClickPendingIntent(
+                R.id.widget_root,
+                HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java),
+            )
+            setTextViewText(R.id.widget_quote, quote)
+            setTextViewTextSize(R.id.widget_quote, TypedValue.COMPLEX_UNIT_SP, textSizeSp)
+            setInt(R.id.widget_quote, "setMaxLines", maxLines)
+            setTextViewText(R.id.widget_attribution, attribution)
+            setViewVisibility(R.id.widget_attribution, if (showAttribution) View.VISIBLE else View.GONE)
+            clockImagePath
+                ?.let { BitmapFactory.decodeFile(it) }
+                ?.let { setImageViewBitmap(R.id.widget_clock_image, it) }
+        }
+        appWidgetManager.updateAppWidget(widgetId, views)
     }
 }
