@@ -17,10 +17,15 @@ class AppThemePalette {
     required this.accent,
   });
 
-  /// A touch of ink mixed into the background — enough that the clock face
-  /// reads as its own disc instead of vanishing into the screen, but light
-  /// enough that ink-colored ticks/hands drawn on top stay legible.
-  Color get clockFace => Color.alphaBlend(ink.withValues(alpha: 0.12), background);
+  /// The clock face's own solid color — the theme's ink, full strength, so
+  /// the disc can never be mistaken for the screen background behind it.
+  Color get clockFace => ink;
+
+  /// Rim/ticks/numerals/hands drawn on that bold face need their own color,
+  /// since [ink] is now the face itself. The theme's `background` is
+  /// guaranteed to read against `ink` already (that's their normal
+  /// text-on-screen relationship, just inverted onto the dial).
+  Color get clockDialInk => background;
 }
 
 /// The four palettes designed in Figma/HTML: cream (default paper look),

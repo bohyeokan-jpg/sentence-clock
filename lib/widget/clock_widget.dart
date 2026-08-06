@@ -16,6 +16,13 @@ class ClockWidget extends StatefulWidget {
   final double digitalFontSize;
   final ClockShape shape;
 
+  /// Color for the dial's rim/ticks/numerals/hands. Defaults to [ink], but
+  /// since [faceFill] is now a bold color deliberately far from the screen
+  /// background (not a subtle tint of it), the dial needs its own color
+  /// that reads against *that* — pass the theme's `background` for that
+  /// (see [AppThemePalette.clockDialInk]), not the digital text's ink.
+  final Color? dialInk;
+
   const ClockWidget({
     super.key,
     required this.ink,
@@ -24,6 +31,7 @@ class ClockWidget extends StatefulWidget {
     this.faceSize = 263,
     this.digitalFontSize = 38,
     this.shape = ClockShape.circle,
+    this.dialInk,
   });
 
   @override
@@ -75,7 +83,7 @@ class _ClockWidgetState extends State<ClockWidget> {
           child: CustomPaint(
             painter: AnalogClockPainter(
               time: _now,
-              ink: widget.ink,
+              ink: widget.dialInk ?? widget.ink,
               accent: widget.accent,
               faceFill: widget.faceFill,
               shape: widget.shape,

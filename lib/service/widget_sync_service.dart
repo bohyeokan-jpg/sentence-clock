@@ -75,7 +75,7 @@ class _ClockFace extends StatelessWidget {
         child: CustomPaint(
           painter: AnalogClockPainter(
             time: DateTime.now(),
-            ink: palette.ink,
+            ink: palette.clockDialInk,
             accent: palette.accent,
             faceFill: palette.clockFace,
             shape: ClockShape.square,
