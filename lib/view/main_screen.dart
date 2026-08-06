@@ -69,24 +69,32 @@ class _PortraitBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        // The gaps above the clock (and between clock and quote) are sized
+        // from the screen height only, never from the quote's own height —
+        // so the clock's position stays put as quotes of different lengths
+        // rotate through every minute. Only the gap below the quote (an
+        // Expanded) absorbs the difference, nudging the footer instead.
+        final topGap = constraints.maxHeight * 0.09;
+        final clockToQuoteGap = constraints.maxHeight * 0.055;
+        final bottomMargin = constraints.maxHeight * 0.03;
         return SingleChildScrollView(
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: IntrinsicHeight(
               child: Column(
                 children: [
-                  const SizedBox(height: 44),
-                  const Spacer(),
+                  SizedBox(height: topGap),
                   ClockWidget(ink: palette.ink, accent: palette.accent, faceFill: palette.background, shape: clockShape),
-                  const Spacer(),
+                  SizedBox(height: clockToQuoteGap),
                   _QuoteBlock(
                     palette: palette,
                     quoteState: quoteState,
                     align: CrossAxisAlignment.center,
                     textAlign: TextAlign.center,
                   ),
-                  const Spacer(),
+                  const Expanded(child: SizedBox()),
                   _FooterNote(palette: palette),
+                  SizedBox(height: bottomMargin),
                 ],
               ),
             ),
