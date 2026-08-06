@@ -1,13 +1,24 @@
+import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 
+import '../model/app_theme.dart';
+import '../model/clock_shape.dart';
 import '../model/quote.dart';
+import '../widget/analog_clock_painter.dart';
 
-/// Pushes the current quote to the Android home-screen widgets.
+/// Pushes the current quote and a freshly-rendered clock face to the
+/// Android home-screen widgets.
 ///
-/// The clock part of each widget is a native `TextClock`, which keeps
-/// itself accurate with no help from Flutter. Only the quote text changes
-/// content (not just time), so that's the one thing this service needs to
-/// push — [SmallWidgetProvider] doesn't even read it back.
+/// The digital time in each widget is a native `TextClock`, which keeps
+/// itself accurate with no help from Flutter. The little square analog
+/// face next to it can't be — RemoteViews has no custom-paint view, so it
+/// has to be a plain image, rendered here (reusing the exact same painter
+/// the in-app clock uses, forced to the square shape so it fills a
+/// rectangular widget tile cleanly) and pushed as a PNG file path via
+/// `home_widget`'s renderFlutterWidget. It only refreshes when the app is
+/// alive to render it (same minute-tick as the quote), so it can go stale
+/// if the app hasn't been opened in a while — the TextClock next to it
+/// stays accurate regardless.
 class WidgetSyncService {
   static const _androidProviders = [
     'SmallWidgetProvider',
@@ -15,11 +26,45 @@ class WidgetSyncService {
     'LargeWidgetProvider',
   ];
 
-  Future<void> syncQuote(Quote quote) async {
+  static const _clockImageSize = 160.0;
+
+  Future<void> sync(Quote quote) async {
     await HomeWidget.saveWidgetData<String>('widget_quote', '"${quote.text}"');
     await HomeWidget.saveWidgetData<String>('widget_attribution', quote.attribution ?? '');
+    await HomeWidget.renderFlutterWidget(
+      _ClockFace(size: _clockImageSize),
+      key: 'widget_clock_image',
+      logicalSize: const Size(_clockImageSize, _clockImageSize),
+      pixelRatio: 2.5,
+    );
     for (final name in _androidProviders) {
       await HomeWidget.updateWidget(androidName: name);
     }
+  }
+}
+
+/// The widget always renders on its own fixed cream card background, so the
+/// clock face uses the cream palette regardless of the in-app theme —
+/// otherwise a dark-themed face could go muddy against the card.
+class _ClockFace extends StatelessWidget {
+  final double size;
+  const _ClockFace({required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = appThemePalettes[AppThemeId.cream]!;
+    return SizedBox(
+      width: size,
+      height: size,
+      child: CustomPaint(
+        painter: AnalogClockPainter(
+          time: DateTime.now(),
+          ink: palette.ink,
+          accent: palette.accent,
+          faceFill: palette.clockFace,
+          shape: ClockShape.square,
+        ),
+      ),
+    );
   }
 }

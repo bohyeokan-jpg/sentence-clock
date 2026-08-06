@@ -8,21 +8,36 @@
     android:background="@drawable/widget_background"
     android:padding="18dp">
 
-    <TextClock
-        android:id="@+id/widget_clock"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:format12Hour="a h:mm"
-        android:format24Hour="a h:mm"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        android:textColor="#2B2620" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/widget_clock_image"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:contentDescription="@null" />
+
+        <TextClock
+            android:id="@+id/widget_clock_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:format12Hour="a h:mm"
+            android:format24Hour="a h:mm"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#2B2620" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/widget_quote"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="14dp"
         android:text="문장을 불러오는 중이에요"
         android:textSize="15sp"
         android:textColor="#2B2620"
