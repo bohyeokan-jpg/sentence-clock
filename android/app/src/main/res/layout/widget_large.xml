@@ -4,27 +4,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center_vertical"
     android:background="@drawable/widget_background"
-    android:padding="18dp">
+    android:padding="16dp">
 
+    <!-- Claims all the height the quote below doesn't need, so the clock
+         row grows with however big the user makes this widget. -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
         <ImageView
             android:id="@+id/widget_clock_image"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="fitCenter"
             android:contentDescription="@null" />
 
         <TextClock
             android:id="@+id/widget_clock_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="14dp"
+            android:layout_marginStart="16dp"
             android:format12Hour="a h:mm"
             android:format24Hour="a h:mm"
             android:textSize="22sp"
@@ -37,20 +41,20 @@
         android:id="@+id/widget_quote"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="10dp"
         android:text="문장을 불러오는 중이에요"
-        android:textSize="15sp"
+        android:textSize="14sp"
         android:textColor="#2B2620"
-        android:maxLines="4"
+        android:maxLines="2"
         android:ellipsize="end" />
 
     <TextView
         android:id="@+id/widget_attribution"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="4dp"
         android:text=""
-        android:textSize="12sp"
+        android:textSize="11sp"
         android:textColor="#8A6438"
         android:maxLines="1"
         android:ellipsize="end" />

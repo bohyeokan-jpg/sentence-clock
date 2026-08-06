@@ -26,7 +26,11 @@ class WidgetSyncService {
     'LargeWidgetProvider',
   ];
 
-  static const _clockImageSize = 160.0;
+  // Rendered larger than any single widget instance needs, since the
+  // medium/large layouts now stretch this image to fill whatever space
+  // the user actually gives the widget (see widget_medium/large.xml) —
+  // a low-res source would go visibly blurry once scaled up.
+  static const _clockImageSize = 240.0;
 
   Future<void> sync(Quote quote) async {
     await HomeWidget.saveWidgetData<String>('widget_quote', '"${quote.text}"');
