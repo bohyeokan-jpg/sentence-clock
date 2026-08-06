@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_vertical"
+    android:background="@drawable/widget_background"
+    android:padding="18dp">
+
+    <TextClock
+        android:id="@+id/widget_clock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:format12Hour="a h:mm"
+        android:format24Hour="a h:mm"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:textColor="#2B2620" />
+
+    <TextView
+        android:id="@+id/widget_quote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="문장을 불러오는 중이에요"
+        android:textSize="15sp"
+        android:textColor="#2B2620"
+        android:maxLines="4"
+        android:ellipsize="end" />
+
+    <TextView
+        android:id="@+id/widget_attribution"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text=""
+        android:textSize="12sp"
+        android:textColor="#8A6438"
+        android:maxLines="1"
+        android:ellipsize="end" />
+
+</LinearLayout>

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/time_state.dart';
 import '../model/quote.dart';
 import '../repository/message_repository.dart';
+import '../service/widget_sync_service.dart';
 
 class QuoteState {
   final String category;
@@ -16,6 +17,7 @@ class QuoteState {
 /// the minute changes, matching the main screen's "1분마다 새 문장" promise.
 class QuoteNotifier extends AsyncNotifier<QuoteState> {
   final _repo = MessageRepository();
+  final _widgetSync = WidgetSyncService();
   Timer? _timer;
   int? _lastMinute;
 
@@ -33,6 +35,7 @@ class QuoteNotifier extends AsyncNotifier<QuoteState> {
     _lastMinute = now.minute;
     final quote = await _repo.quoteFor(category, previous: previous) ??
         const Quote(text: '오늘의 문장을 준비하고 있어요.', book: '', author: '');
+    unawaited(_widgetSync.syncQuote(quote));
     return QuoteState(category: category, quote: quote);
   }
 
