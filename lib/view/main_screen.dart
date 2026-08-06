@@ -87,7 +87,7 @@ class _PortraitBody extends StatelessWidget {
               child: Column(
                 children: [
                   SizedBox(height: topGap),
-                  ClockWidget(ink: palette.ink, accent: palette.accent, faceFill: palette.background, shape: clockShape),
+                  ClockWidget(ink: palette.ink, accent: palette.accent, faceFill: palette.clockFace, shape: clockShape),
                   SizedBox(height: clockToQuoteGap),
                   Expanded(
                     child: Center(
@@ -143,7 +143,7 @@ class _SplitBody extends StatelessWidget {
                   ClockWidget(
                     ink: palette.ink,
                     accent: palette.accent,
-                    faceFill: palette.background,
+                    faceFill: palette.clockFace,
                     faceSize: clockSize,
                     digitalFontSize: compact ? 24 : 30,
                     shape: clockShape,

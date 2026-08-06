@@ -16,6 +16,11 @@ class AppThemePalette {
     required this.ink,
     required this.accent,
   });
+
+  /// A touch of ink mixed into the background — enough that the clock face
+  /// reads as its own disc instead of vanishing into the screen, but light
+  /// enough that ink-colored ticks/hands drawn on top stay legible.
+  Color get clockFace => Color.alphaBlend(ink.withValues(alpha: 0.12), background);
 }
 
 /// The four palettes designed in Figma/HTML: cream (default paper look),
