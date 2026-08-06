@@ -1,0 +1,1 @@
+enum ClockShape { circle, square }
