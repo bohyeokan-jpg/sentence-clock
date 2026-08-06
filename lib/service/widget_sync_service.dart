@@ -43,9 +43,19 @@ class WidgetSyncService {
   }
 }
 
+/// Matches widget_background.xml's solid card color exactly.
+const _widgetCardColor = Color(0xFFF6F1E7);
+
 /// The widget always renders on its own fixed cream card background, so the
 /// clock face uses the cream palette regardless of the in-app theme —
 /// otherwise a dark-themed face could go muddy against the card.
+///
+/// renderFlutterWidget captures a plain (alpha-channel) PNG, and the square
+/// clock's corners fall outside its rounded-rect shape — left unpainted,
+/// they'd be fully transparent in that PNG, letting whatever is behind the
+/// widget's ImageView show through at the corners. Filling the whole canvas
+/// with the card color first (ColoredBox, not just the painter's own fill)
+/// makes every pixel opaque, corners included.
 class _ClockFace extends StatelessWidget {
   final double size;
   const _ClockFace({required this.size});
@@ -53,16 +63,19 @@ class _ClockFace extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = appThemePalettes[AppThemeId.cream]!;
-    return SizedBox(
-      width: size,
-      height: size,
-      child: CustomPaint(
-        painter: AnalogClockPainter(
-          time: DateTime.now(),
-          ink: palette.ink,
-          accent: palette.accent,
-          faceFill: palette.clockFace,
-          shape: ClockShape.square,
+    return ColoredBox(
+      color: _widgetCardColor,
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: CustomPaint(
+          painter: AnalogClockPainter(
+            time: DateTime.now(),
+            ink: palette.ink,
+            accent: palette.accent,
+            faceFill: palette.clockFace,
+            shape: ClockShape.square,
+          ),
         ),
       ),
     );
