@@ -9,6 +9,7 @@ import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetPlugin
 import es.antonborri.home_widget.HomeWidgetProvider
+import java.util.Calendar
 
 class LargeWidgetProvider : HomeWidgetProvider() {
     override fun onUpdate(
@@ -60,6 +61,10 @@ class LargeWidgetProvider : HomeWidgetProvider() {
             )
             setTextViewText(R.id.widget_quote, quote)
             setTextViewText(R.id.widget_attribution, attribution)
+            setTextViewText(
+                R.id.widget_meridiem,
+                if (Calendar.getInstance().get(Calendar.AM_PM) == Calendar.AM) "AM" else "PM",
+            )
             setViewVisibility(R.id.widget_attribution, if (showAttribution) View.VISIBLE else View.GONE)
             applyAlarmHand(this, widgetData)
         }

@@ -44,12 +44,28 @@
         android:orientation="vertical"
         android:gravity="center_vertical">
 
+        <!-- TextClock's "a" (AM/PM) symbol is locale-driven — on a Korean
+             device it always renders "오전/오후" no matter what pattern we
+             ask for, with no way to force English while it keeps ticking
+             on its own. So the AM/PM label is a separate, small, plain
+             TextView (widget_meridiem) that Kotlin sets in English —
+             everything that actually needs to stay accurate every minute
+             (h:mm) is still the native, self-ticking part. -->
+        <TextView
+            android:id="@+id/widget_meridiem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="AM"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#2B2620" />
+
         <TextClock
             android:id="@+id/widget_clock_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:format12Hour="a h:mm"
-            android:format24Hour="a h:mm"
+            android:format12Hour="h:mm"
+            android:format24Hour="h:mm"
             android:textSize="34sp"
             android:textStyle="bold"
             android:textColor="#2B2620" />
