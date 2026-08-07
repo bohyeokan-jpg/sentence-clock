@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Used instead of widget_medium.xml when the user resizes the widget
+     taller than it is wide (see MediumWidgetProvider.apply()). Same content,
+     same view ids (RemoteViews.setXxx calls work unchanged against either
+     layout) — just stacked vertically: clock+time row on top, quote
+     spanning the full width below, instead of a clock/text side-by-side
+     split that would get cramped in a narrow-but-tall box. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_background"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <AnalogClock
+                android:id="@+id/widget_clock_analog"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:dial="@drawable/widget_clock_dial"
+                android:hand_hour="@drawable/widget_clock_hand_hour"
+                android:hand_minute="@drawable/widget_clock_hand_minute" />
+
+            <ImageView
+                android:id="@+id/widget_clock_hand_alarm"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/widget_clock_hand_alarm"
+                android:visibility="gone"
+                android:contentDescription="@null" />
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/widget_meridiem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:text="AM"
+                android:textSize="27sp"
+                android:textStyle="bold"
+                android:textColor="#2B2620" />
+
+            <TextClock
+                android:id="@+id/widget_clock_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:format12Hour="h:mm"
+                android:format24Hour="h:mm"
+                android:textSize="34sp"
+                android:textStyle="bold"
+                android:textColor="#2B2620" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Bounded (0dp+weight, not wrap_content) so autosize has an actual
+         box to shrink the font within — same reasoning as widget_medium.xml. -->
+    <TextView
+        android:id="@+id/widget_quote"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:text="문장을 불러오는 중이에요"
+        android:textColor="#4A4038"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="8sp"
+        android:autoSizeMaxTextSize="26sp"
+        android:autoSizeStepGranularity="1sp" />
+
+</LinearLayout>
