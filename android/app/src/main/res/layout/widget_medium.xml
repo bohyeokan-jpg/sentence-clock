@@ -38,7 +38,7 @@
     </FrameLayout>
 
     <LinearLayout
-        android:layout_width="110dp"
+        android:layout_width="150dp"
         android:layout_height="match_parent"
         android:layout_marginStart="8dp"
         android:orientation="vertical"
@@ -52,30 +52,39 @@
              to stay accurate every minute (h:mm) is still the native,
              self-ticking part.
 
-             Time right-aligned on top, AM/PM right-aligned directly below
-             it (both android:gravity="end" in a match_parent-width column)
-             — reads like a simple digital clock corner display. -->
-        <TextClock
-            android:id="@+id/widget_clock_text"
-            android:layout_width="match_parent"
+             AM/PM sits directly in front of (left of) the time, same
+             textSize as the digits, on one row — the column widened from
+             110dp to 150dp to fit both without shrinking the clock (the
+             clock's actual rendered size is capped by the widget's
+             *height*, not this column's width, as long as the clock's
+             own area stays taller than it is wide — true up to ~182dp
+             here, so 150dp leaves the clock untouched). -->
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="end"
-            android:format12Hour="h:mm"
-            android:format24Hour="h:mm"
-            android:textSize="34sp"
-            android:textStyle="bold"
-            android:textColor="#2B2620" />
+            android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/widget_meridiem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:gravity="end"
-            android:text="AM"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            android:textColor="#2B2620" />
+            <TextView
+                android:id="@+id/widget_meridiem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:text="AM"
+                android:textSize="34sp"
+                android:textStyle="bold"
+                android:textColor="#2B2620" />
+
+            <TextClock
+                android:id="@+id/widget_clock_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:format12Hour="h:mm"
+                android:format24Hour="h:mm"
+                android:textSize="34sp"
+                android:textStyle="bold"
+                android:textColor="#2B2620" />
+
+        </LinearLayout>
 
         <!-- Bounded (0dp+weight, not wrap_content) so autosize has an actual
              box to shrink the font within — it picks the largest size where
