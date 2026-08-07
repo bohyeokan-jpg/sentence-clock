@@ -1,54 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Clock top-left, time top-right of the clock (same row), quote spanning
+     the full width below both — one fixed arrangement regardless of how
+     the widget gets resized (no more switching between a side-by-side and
+     a stacked layout based on aspect ratio). -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
+    android:orientation="vertical"
     android:background="@drawable/widget_background"
     android:padding="10dp">
 
-    <!-- AnalogClock keeps ticking on its own (system-driven, like TextClock)
-         with no help from the app. The alarm hand can't live inside it —
-         AnalogClock only supports hour/minute drawables — so it's a
-         same-bounds ImageView stacked on top instead, rotated in Kotlin via
-         setFloat(..., "setRotation", angle).
-
-         weight=11 against the text column's weight=9 (~55/45 split) instead
-         of a fixed dp width for the column — when the user drags the widget
-         wider, both sides now grow together instead of all the extra width
-         going to the clock alone and leaving the text column looking
-         cramped. -->
-    <FrameLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="11">
-
-        <AnalogClock
-            android:id="@+id/widget_clock_analog"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:dial="@drawable/widget_clock_dial"
-            android:hand_hour="@drawable/widget_clock_hand_hour"
-            android:hand_minute="@drawable/widget_clock_hand_minute" />
-
-        <ImageView
-            android:id="@+id/widget_clock_hand_alarm"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/widget_clock_hand_alarm"
-            android:visibility="gone"
-            android:contentDescription="@null" />
-
-    </FrameLayout>
-
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="9"
-        android:layout_marginStart="8dp"
-        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
         android:gravity="center_vertical">
+
+        <!-- AnalogClock keeps ticking on its own (system-driven, like
+             TextClock) with no help from the app. The alarm hand can't
+             live inside it — AnalogClock only supports hour/minute
+             drawables — so it's a same-bounds ImageView stacked on top
+             instead, rotated in Kotlin via setFloat(..., "setRotation",
+             angle). -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <AnalogClock
+                android:id="@+id/widget_clock_analog"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:dial="@drawable/widget_clock_dial"
+                android:hand_hour="@drawable/widget_clock_hand_hour"
+                android:hand_minute="@drawable/widget_clock_hand_minute" />
+
+            <ImageView
+                android:id="@+id/widget_clock_hand_alarm"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/widget_clock_hand_alarm"
+                android:visibility="gone"
+                android:contentDescription="@null" />
+
+        </FrameLayout>
 
         <!-- TextClock's "a" (AM/PM) symbol is locale-driven — on a Korean
              device it always renders "오전/오후" no matter what pattern we
@@ -56,23 +53,13 @@
              on its own. So the AM/PM label is a separate, plain TextView
              that Kotlin sets in English — everything that actually needs
              to stay accurate every minute (h:mm) is still the native,
-             self-ticking part.
-
-             AM/PM sits directly in front of (left of) the time, same
-             textSize as the digits, on one row — the column widened from
-             110dp to 150dp to fit both without shrinking the clock (the
-             clock's actual rendered size is capped by the widget's
-             *height*, not this column's width, as long as the clock's
-             own area stays taller than it is wide — true up to ~182dp
-             here, so 150dp leaves the clock untouched). -->
+             self-ticking part. -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:gravity="center_vertical">
 
-            <!-- 20% smaller than the digits (34sp * 0.8 = ~27sp) — same
-                 row, same baseline, just less visually dominant than the
-                 time itself. -->
             <TextView
                 android:id="@+id/widget_meridiem"
                 android:layout_width="wrap_content"
@@ -95,24 +82,26 @@
 
         </LinearLayout>
 
-        <!-- Bounded (0dp+weight, not wrap_content) so autosize has an actual
-             box to shrink the font within — it picks the largest size where
-             the *whole* quote fits, wrapped across as many lines as it
-             needs, instead of a fixed size that clips long quotes with
-             an ellipsis. -->
-        <TextView
-            android:id="@+id/widget_quote"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginTop="6dp"
-            android:text="문장을 불러오는 중이에요"
-            android:textColor="#4A4038"
-            android:autoSizeTextType="uniform"
-            android:autoSizeMinTextSize="8sp"
-            android:autoSizeMaxTextSize="26sp"
-            android:autoSizeStepGranularity="1sp" />
-
     </LinearLayout>
+
+    <!-- Bounded (0dp+weight, not wrap_content) so autosize has an actual
+         box to shrink the font within — it picks the largest size where
+         the *whole* quote fits, instead of a fixed size that clips long
+         quotes with an ellipsis. Side margins keep lines from stretching
+         edge-to-edge when the widget is wide. -->
+    <TextView
+        android:id="@+id/widget_quote"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:text="문장을 불러오는 중이에요"
+        android:textColor="#4A4038"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="8sp"
+        android:autoSizeMaxTextSize="26sp"
+        android:autoSizeStepGranularity="1sp" />
 
 </LinearLayout>

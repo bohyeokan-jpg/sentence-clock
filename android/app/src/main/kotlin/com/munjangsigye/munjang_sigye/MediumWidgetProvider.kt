@@ -17,9 +17,7 @@ class MediumWidgetProvider : HomeWidgetProvider() {
         appWidgetIds: IntArray,
         widgetData: SharedPreferences,
     ) {
-        appWidgetIds.forEach { widgetId ->
-            apply(context, appWidgetManager, widgetId, widgetData, appWidgetManager.getAppWidgetOptions(widgetId))
-        }
+        appWidgetIds.forEach { widgetId -> apply(context, appWidgetManager, widgetId, widgetData) }
     }
 
     // Resizing the widget still needs a fresh RemoteViews to pick up the
@@ -34,7 +32,7 @@ class MediumWidgetProvider : HomeWidgetProvider() {
         newOptions: Bundle,
     ) {
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
-        apply(context, appWidgetManager, appWidgetId, HomeWidgetPlugin.getData(context), newOptions)
+        apply(context, appWidgetManager, appWidgetId, HomeWidgetPlugin.getData(context))
     }
 
     private fun apply(
@@ -42,22 +40,12 @@ class MediumWidgetProvider : HomeWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         widgetId: Int,
         widgetData: SharedPreferences,
-        options: Bundle,
     ) {
         val quote = widgetData.getString("widget_quote", null) ?: "문장을 불러오는 중이에요"
 
-        // Taller-than-wide box (user dragged the widget into a vertical
-        // shape) switches to widget_medium_vertical.xml — clock+time row on
-        // top, quote spanning the full width below — instead of the default
-        // side-by-side split, which gets cramped in a narrow column.
-        val width = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 0)
-        val height = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 0)
-        val layoutRes = if (height > width) R.layout.widget_medium_vertical else R.layout.widget_medium
-
-        // The clock itself is a native AnalogClock (see widget_medium.xml /
-        // widget_medium_vertical.xml) — it ticks on its own, no data or
-        // per-update work needed here.
-        val views = RemoteViews(context.packageName, layoutRes).apply {
+        // The clock itself is a native AnalogClock (see widget_medium.xml) —
+        // it ticks on its own, no data or per-update work needed here.
+        val views = RemoteViews(context.packageName, R.layout.widget_medium).apply {
             setOnClickPendingIntent(
                 R.id.widget_root,
                 HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java),
