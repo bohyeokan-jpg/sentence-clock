@@ -3,7 +3,6 @@ package com.munjangsigye.munjang_sigye
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.TypedValue
 import android.widget.RemoteViews
@@ -44,7 +43,6 @@ class MediumWidgetProvider : HomeWidgetProvider() {
         options: Bundle,
     ) {
         val quote = widgetData.getString("widget_quote", null) ?: "문장을 불러오는 중이에요"
-        val clockImagePath = widgetData.getString("widget_clock_image", null)
         val heightDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 110)
 
         // More vertical room -> more lines of the quote get to show instead
@@ -56,6 +54,8 @@ class MediumWidgetProvider : HomeWidgetProvider() {
             else -> 6 to 12.5f
         }
 
+        // The clock itself is a native AnalogClock (see widget_medium.xml) —
+        // it ticks on its own, no data or per-update work needed here.
         val views = RemoteViews(context.packageName, R.layout.widget_medium).apply {
             setOnClickPendingIntent(
                 R.id.widget_root,
@@ -64,9 +64,6 @@ class MediumWidgetProvider : HomeWidgetProvider() {
             setTextViewText(R.id.widget_quote, quote)
             setTextViewTextSize(R.id.widget_quote, TypedValue.COMPLEX_UNIT_SP, textSizeSp)
             setInt(R.id.widget_quote, "setMaxLines", maxLines)
-            clockImagePath
-                ?.let { BitmapFactory.decodeFile(it) }
-                ?.let { setImageViewBitmap(R.id.widget_clock_image, it) }
         }
         appWidgetManager.updateAppWidget(widgetId, views)
     }

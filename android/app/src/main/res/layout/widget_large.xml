@@ -16,13 +16,14 @@
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
-        <ImageView
-            android:id="@+id/widget_clock_image"
+        <AnalogClock
+            android:id="@+id/widget_clock_analog"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:scaleType="fitCenter"
-            android:contentDescription="@null" />
+            android:dial="@drawable/widget_clock_dial"
+            android:hand_hour="@drawable/widget_clock_hand_hour"
+            android:hand_minute="@drawable/widget_clock_hand_minute" />
 
         <TextClock
             android:id="@+id/widget_clock_text"

@@ -3,7 +3,6 @@ package com.munjangsigye.munjang_sigye
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.View
@@ -43,7 +42,6 @@ class LargeWidgetProvider : HomeWidgetProvider() {
     ) {
         val quote = widgetData.getString("widget_quote", null) ?: "문장을 불러오는 중이에요"
         val attribution = widgetData.getString("widget_attribution", null) ?: ""
-        val clockImagePath = widgetData.getString("widget_clock_image", null)
         val heightDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 180)
 
         // Same idea as the medium widget: a taller tile shows more of the
@@ -55,6 +53,8 @@ class LargeWidgetProvider : HomeWidgetProvider() {
             else -> Triple(5, 16f, true)
         }
 
+        // The clock itself is a native AnalogClock (see widget_large.xml) —
+        // it ticks on its own, no data or per-update work needed here.
         val views = RemoteViews(context.packageName, R.layout.widget_large).apply {
             setOnClickPendingIntent(
                 R.id.widget_root,
@@ -65,9 +65,6 @@ class LargeWidgetProvider : HomeWidgetProvider() {
             setInt(R.id.widget_quote, "setMaxLines", maxLines)
             setTextViewText(R.id.widget_attribution, attribution)
             setViewVisibility(R.id.widget_attribution, if (showAttribution) View.VISIBLE else View.GONE)
-            clockImagePath
-                ?.let { BitmapFactory.decodeFile(it) }
-                ?.let { setImageViewBitmap(R.id.widget_clock_image, it) }
         }
         appWidgetManager.updateAppWidget(widgetId, views)
     }

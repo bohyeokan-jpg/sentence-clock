@@ -8,17 +8,17 @@
     android:background="@drawable/widget_background"
     android:padding="12dp">
 
-    <!-- Takes all the width the text column doesn't need, and the full
-         widget height — fitCenter then makes it as large as that box
-         allows while staying square, so it scales with however big the
-         user actually makes this widget. -->
-    <ImageView
-        android:id="@+id/widget_clock_image"
+    <!-- Native view, so it keeps ticking on its own (system-driven, like
+         TextClock) with no help from the app — takes all the width the
+         text column doesn't need, and the full widget height. -->
+    <AnalogClock
+        android:id="@+id/widget_clock_analog"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:scaleType="fitCenter"
-        android:contentDescription="@null" />
+        android:dial="@drawable/widget_clock_dial"
+        android:hand_hour="@drawable/widget_clock_hand_hour"
+        android:hand_minute="@drawable/widget_clock_hand_minute" />
 
     <LinearLayout
         android:layout_width="72dp"
