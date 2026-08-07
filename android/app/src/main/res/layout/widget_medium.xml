@@ -47,73 +47,35 @@
         <!-- TextClock's "a" (AM/PM) symbol is locale-driven — on a Korean
              device it always renders "오전/오후" no matter what pattern we
              ask for, with no way to force English while it keeps ticking
-             on its own. So the AM/PM label is separate, plain TextViews
+             on its own. So the AM/PM label is a separate, plain TextView
              that Kotlin sets in English — everything that actually needs
              to stay accurate every minute (h:mm) is still the native,
              self-ticking part.
 
-             Two stacked TextViews (not one TextView with a "\n") because a
-             single multi-line TextView's line-height math (needed to fit
-             two lines snugly) clips/overlaps bold glyphs at small sizes —
-             looked broken. Two independent views is pixel-exact instead:
-             includeFontPadding="false" strips each glyph's internal
-             leading so they stack with no gap and no overlap, and the
-             whole block gets centered against the time by the parent
-             row's gravity="center_vertical" — same alignment mechanism,
-             just without the multi-line clipping. Bottom letter is always
-             "M" (both AM and PM end in it), so only the top letter changes. -->
-        <LinearLayout
-            android:layout_width="wrap_content"
+             Time right-aligned on top, AM/PM right-aligned directly below
+             it (both android:gravity="end" in a match_parent-width column)
+             — reads like a simple digital clock corner display. -->
+        <TextClock
+            android:id="@+id/widget_clock_text"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical">
+            android:gravity="end"
+            android:format12Hour="h:mm"
+            android:format24Hour="h:mm"
+            android:textSize="34sp"
+            android:textStyle="bold"
+            android:textColor="#2B2620" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="3dp"
-                android:orientation="vertical"
-                android:gravity="center_horizontal">
-
-                <!-- Fixed width+gravity=center (not wrap_content) so "A"/"P"
-                     and "M" each render inside the exact same size box —
-                     otherwise the narrower glyph (e.g. "P") sits in a
-                     smaller box than "M" and the two lines don't line up
-                     underneath each other. -->
-                <TextView
-                    android:id="@+id/widget_meridiem_top"
-                    android:layout_width="14dp"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:includeFontPadding="false"
-                    android:text="A"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:textColor="#2B2620" />
-
-                <TextView
-                    android:id="@+id/widget_meridiem_bottom"
-                    android:layout_width="14dp"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:includeFontPadding="false"
-                    android:text="M"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:textColor="#2B2620" />
-
-            </LinearLayout>
-
-            <TextClock
-                android:id="@+id/widget_clock_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:format12Hour="h:mm"
-                android:format24Hour="h:mm"
-                android:textSize="34sp"
-                android:textStyle="bold"
-                android:textColor="#2B2620" />
-
-        </LinearLayout>
+        <TextView
+            android:id="@+id/widget_meridiem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="end"
+            android:text="AM"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#2B2620" />
 
         <!-- Bounded (0dp+weight, not wrap_content) so autosize has an actual
              box to shrink the font within — it picks the largest size where
