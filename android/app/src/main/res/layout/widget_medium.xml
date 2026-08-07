@@ -47,29 +47,54 @@
         <!-- TextClock's "a" (AM/PM) symbol is locale-driven — on a Korean
              device it always renders "오전/오후" no matter what pattern we
              ask for, with no way to force English while it keeps ticking
-             on its own. So the AM/PM label is a separate, small, plain
-             TextView (widget_meridiem) that Kotlin sets in English —
-             everything that actually needs to stay accurate every minute
-             (h:mm) is still the native, self-ticking part. Text is set to
-             "A\nM" / "P\nM" (two lines) so it reads vertically, stacked
-             beside the time like a watch face. -->
+             on its own. So the AM/PM label is separate, plain TextViews
+             that Kotlin sets in English — everything that actually needs
+             to stay accurate every minute (h:mm) is still the native,
+             self-ticking part.
+
+             Two stacked TextViews (not one TextView with a "\n") because a
+             single multi-line TextView's line-height math (needed to fit
+             two lines snugly) clips/overlaps bold glyphs at small sizes —
+             looked broken. Two independent views is pixel-exact instead:
+             includeFontPadding="false" strips each glyph's internal
+             leading so they stack with no gap and no overlap, and the
+             whole block gets centered against the time by the parent
+             row's gravity="center_vertical" — same alignment mechanism,
+             just without the multi-line clipping. Bottom letter is always
+             "M" (both AM and PM end in it), so only the top letter changes. -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/widget_meridiem"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="3dp"
-                android:text="A\nM"
-                android:gravity="center"
-                android:lineSpacingMultiplier="0.8"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:textColor="#2B2620" />
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/widget_meridiem_top"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:text="A"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#2B2620" />
+
+                <TextView
+                    android:id="@+id/widget_meridiem_bottom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:text="M"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#2B2620" />
+
+            </LinearLayout>
 
             <TextClock
                 android:id="@+id/widget_clock_text"
