@@ -111,7 +111,7 @@ class AnalogClockPainter extends CustomPainter {
 
     if (alarmHour != null && alarmMinute != null) {
       final alarmAngle = ((alarmHour! % 12) + alarmMinute! / 60) / 12 * 2 * pi;
-      drawHand(alarmAngle, 0.56, 0.018, alarmRed);
+      drawHand(alarmAngle, 0.30, 0.018, alarmRed); // shortest of the three
     }
 
     drawHand(hourAngle, 0.42, 0.03, ink);
