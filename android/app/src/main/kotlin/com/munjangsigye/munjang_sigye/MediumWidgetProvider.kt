@@ -43,15 +43,18 @@ class MediumWidgetProvider : HomeWidgetProvider() {
         options: Bundle,
     ) {
         val quote = widgetData.getString("widget_quote", null) ?: "문장을 불러오는 중이에요"
-        val heightDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 110)
+        val heightDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 170)
 
         // More vertical room -> more lines of the quote get to show instead
         // of being clipped, with a slightly bigger font so a taller tile
-        // doesn't just look like empty space was left over.
+        // doesn't just look like empty space was left over. Base sizes
+        // roughly tripled from the original 10/11/12.5sp — the whole widget
+        // defaults to a bigger footprint now (see widget_medium_info.xml)
+        // specifically so both the clock and this text could grow.
         val (maxLines, textSizeSp) = when {
-            heightDp < 80 -> 1 to 10f
-            heightDp < 150 -> 3 to 11f
-            else -> 6 to 12.5f
+            heightDp < 100 -> 1 to 22f
+            heightDp < 170 -> 2 to 26f
+            else -> 3 to 30f
         }
 
         // The clock itself is a native AnalogClock (see widget_medium.xml) —

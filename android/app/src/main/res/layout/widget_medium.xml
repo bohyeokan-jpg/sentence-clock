@@ -6,7 +6,7 @@
     android:orientation="horizontal"
     android:gravity="center_vertical"
     android:background="@drawable/widget_background"
-    android:padding="12dp">
+    android:padding="10dp">
 
     <!-- AnalogClock keeps ticking on its own (system-driven, like TextClock)
          with no help from the app. The alarm hand can't live inside it —
@@ -38,9 +38,9 @@
     </FrameLayout>
 
     <LinearLayout
-        android:layout_width="72dp"
+        android:layout_width="110dp"
         android:layout_height="match_parent"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="8dp"
         android:orientation="vertical"
         android:gravity="center_vertical">
 
@@ -50,7 +50,7 @@
             android:layout_height="wrap_content"
             android:format12Hour="a h:mm"
             android:format24Hour="a h:mm"
-            android:textSize="13sp"
+            android:textSize="34sp"
             android:textStyle="bold"
             android:textColor="#2B2620" />
 
@@ -58,9 +58,9 @@
             android:id="@+id/widget_quote"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="6dp"
             android:text="문장을 불러오는 중이에요"
-            android:textSize="10.5sp"
+            android:textSize="26sp"
             android:textColor="#4A4038"
             android:maxLines="3"
             android:ellipsize="end" />

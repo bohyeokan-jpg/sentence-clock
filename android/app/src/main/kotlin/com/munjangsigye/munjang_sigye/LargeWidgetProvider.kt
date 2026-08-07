@@ -42,15 +42,18 @@ class LargeWidgetProvider : HomeWidgetProvider() {
     ) {
         val quote = widgetData.getString("widget_quote", null) ?: "문장을 불러오는 중이에요"
         val attribution = widgetData.getString("widget_attribution", null) ?: ""
-        val heightDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 180)
+        val heightDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 260)
 
         // Same idea as the medium widget: a taller tile shows more of the
         // quote (and eventually the attribution line) instead of clipping
-        // it, rather than leaving the extra room empty.
+        // it, rather than leaving the extra room empty. Base sizes roughly
+        // doubled from the original 13/14/16sp — the widget defaults to a
+        // bigger footprint now (see widget_large_info.xml) specifically so
+        // both the clock and this text could grow.
         val (maxLines, textSizeSp, showAttribution) = when {
-            heightDp < 120 -> Triple(1, 13f, false)
-            heightDp < 200 -> Triple(2, 14f, true)
-            else -> Triple(5, 16f, true)
+            heightDp < 180 -> Triple(1, 26f, false)
+            heightDp < 260 -> Triple(2, 30f, true)
+            else -> Triple(3, 34f, true)
         }
 
         // The clock itself is a native AnalogClock (see widget_large.xml) —
