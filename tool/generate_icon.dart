@@ -98,6 +98,19 @@ void _drawComposition(img.Image icon, double cx, double cy, double canvas, doubl
   // cream background, with cream hands cut into it.
   _fillCircle(icon, cx, clockCy, clockR, _ink);
 
+  // Four cardinal tick marks (12/3/6/9) for a classic clock-face read,
+  // rather than a bare disc with just two hands. Deliberately much bolder
+  // than the in-app dial's ticks — those are tuned for a ~260px on-screen
+  // face, this has to still register at a 48px launcher icon.
+  for (final tickAngle in [0.0, 90.0, 180.0, 270.0]) {
+    final a = tickAngle * math.pi / 180;
+    final outer = clockR * 0.92;
+    final inner = clockR * 0.66;
+    final x0 = cx + inner * math.sin(a), y0 = clockCy - inner * math.cos(a);
+    final x1 = cx + outer * math.sin(a), y1 = clockCy - outer * math.cos(a);
+    _thickLine(icon, x0, y0, x1, y1, clockR * 0.11, _cream);
+  }
+
   void hand(double angleDeg, double lengthFrac, double widthFrac, Rgb color) {
     final a = angleDeg * math.pi / 180;
     final length = clockR * lengthFrac;
