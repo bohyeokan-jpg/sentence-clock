@@ -60,10 +60,10 @@ class SettingsScreen extends ConsumerWidget {
                         data: (config) {
                           final hour12 = config.hour % 12 == 0 ? 12 : config.hour % 12;
                           final mm = config.minute.toString().padLeft(2, '0');
-                          final meridiem = config.hour >= 12 ? '오후' : '오전';
+                          final meridiem = config.hour >= 12 ? 'PM' : 'AM';
                           return Text(
                             config.enabled ? '$meridiem $hour12:$mm' : '알람 꺼짐',
-                            style: GoogleFonts.notoSansKr(fontSize: 14, color: palette.ink),
+                            style: GoogleFonts.notoSansKr(fontSize: 12.5, color: palette.ink), // ~10% smaller (AM/PM vs 오전/오후)
                           );
                         },
                         loading: () => Text('...', style: GoogleFonts.notoSansKr(color: palette.ink)),

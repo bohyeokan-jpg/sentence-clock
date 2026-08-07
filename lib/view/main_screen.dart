@@ -185,7 +185,7 @@ class _SplitBody extends StatelessWidget {
                     faceFill: palette.clockFace,
                     dialInk: palette.clockDialInk,
                     faceSize: clockSize,
-                    digitalFontSize: compact ? 24 : 30,
+                    digitalFontSize: compact ? 22 : 27, // ~10% smaller now that it reads "AM/PM" instead of "오전/오후"
                     shape: clockShape,
                     alarmHour: alarmHour,
                     alarmMinute: alarmMinute,
@@ -282,7 +282,7 @@ class _AlarmBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final hour12 = hour % 12 == 0 ? 12 : hour % 12;
     final mm = minute.toString().padLeft(2, '0');
-    final meridiem = hour >= 12 ? '오후' : '오전';
+    final meridiem = hour >= 12 ? 'PM' : 'AM';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -297,7 +297,7 @@ class _AlarmBadge extends StatelessWidget {
           Text(
             '$meridiem $hour12:$mm',
             style: GoogleFonts.notoSansKr(
-              fontSize: 11.5,
+              fontSize: 10.5, // ~10% smaller now that it reads "AM/PM h:mm" instead of "오전 h:mm"
               color: palette.accent,
               fontFeatures: const [FontFeature.tabularFigures()],
             ),

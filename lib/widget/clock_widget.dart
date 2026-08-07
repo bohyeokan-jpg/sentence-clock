@@ -33,7 +33,7 @@ class ClockWidget extends StatefulWidget {
     required this.accent,
     required this.faceFill,
     this.faceSize = 263,
-    this.digitalFontSize = 38,
+    this.digitalFontSize = 34, // ~10% smaller now that it reads "AM/PM h:mm:ss" instead of "오전 h:mm:ss"
     this.shape = ClockShape.circle,
     this.dialInk,
     this.alarmHour,
@@ -71,7 +71,7 @@ class _ClockWidgetState extends State<ClockWidget> {
   }
 
   String _digital(DateTime t) {
-    final meridiem = t.hour < 12 ? '오전' : '오후';
+    final meridiem = t.hour < 12 ? 'AM' : 'PM';
     final hour12 = t.hour % 12 == 0 ? 12 : t.hour % 12;
     final mm = t.minute.toString().padLeft(2, '0');
     final ss = t.second.toString().padLeft(2, '0');

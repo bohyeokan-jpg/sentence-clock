@@ -233,8 +233,9 @@ class _AlarmSettingsScreenState extends ConsumerState<AlarmSettingsScreen> {
 
   Widget _timeLabel(AppThemePalette palette) {
     final mm = _minute.toString().padLeft(2, '0');
-    return Text('${_isPm ? '오후' : '오전'} $_hour12:$mm',
-        style: GoogleFonts.notoSansKr(fontSize: 20, fontWeight: FontWeight.w600, color: palette.ink));
+    return Text('${_isPm ? 'PM' : 'AM'} $_hour12:$mm',
+        style: GoogleFonts.notoSansKr(
+            fontSize: 18, fontWeight: FontWeight.w600, color: palette.ink)); // ~10% smaller (AM/PM vs 오전/오후)
   }
 
   Widget _amPmToggle(AppThemePalette palette) {
@@ -257,7 +258,7 @@ class _AlarmSettingsScreenState extends ConsumerState<AlarmSettingsScreen> {
       );
     }
 
-    return Row(mainAxisAlignment: MainAxisAlignment.center, children: [chip('오전', false), chip('오후', true)]);
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: [chip('AM', false), chip('PM', true)]);
   }
 
   Widget _minuteChips(AppThemePalette palette) {
