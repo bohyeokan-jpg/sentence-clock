@@ -74,10 +74,16 @@
                 android:orientation="vertical"
                 android:gravity="center_horizontal">
 
+                <!-- Fixed width+gravity=center (not wrap_content) so "A"/"P"
+                     and "M" each render inside the exact same size box —
+                     otherwise the narrower glyph (e.g. "P") sits in a
+                     smaller box than "M" and the two lines don't line up
+                     underneath each other. -->
                 <TextView
                     android:id="@+id/widget_meridiem_top"
-                    android:layout_width="wrap_content"
+                    android:layout_width="14dp"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:includeFontPadding="false"
                     android:text="A"
                     android:textSize="13sp"
@@ -86,8 +92,9 @@
 
                 <TextView
                     android:id="@+id/widget_meridiem_bottom"
-                    android:layout_width="wrap_content"
+                    android:layout_width="14dp"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:includeFontPadding="false"
                     android:text="M"
                     android:textSize="13sp"
