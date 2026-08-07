@@ -42,7 +42,7 @@ class LargeWidgetProvider : HomeWidgetProvider() {
     ) {
         val quote = widgetData.getString("widget_quote", null) ?: "문장을 불러오는 중이에요"
         val attribution = widgetData.getString("widget_attribution", null) ?: ""
-        val heightDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 260)
+        val heightDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 300)
 
         // Same idea as the medium widget: a taller tile shows more of the
         // quote (and eventually the attribution line) instead of clipping

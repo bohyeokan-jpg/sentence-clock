@@ -43,7 +43,7 @@ class MediumWidgetProvider : HomeWidgetProvider() {
         options: Bundle,
     ) {
         val quote = widgetData.getString("widget_quote", null) ?: "문장을 불러오는 중이에요"
-        val heightDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 170)
+        val heightDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 220)
 
         // More vertical room -> more lines of the quote get to show instead
         // of being clipped, with a slightly bigger font so a taller tile
