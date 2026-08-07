@@ -99,14 +99,23 @@ class _ClockWidgetState extends State<ClockWidget> {
           ),
         ),
         const SizedBox(height: 10),
-        Text(
-          _digital(_now),
-          style: GoogleFonts.notoSansKr(
-            fontSize: widget.digitalFontSize,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 1,
-            color: widget.ink,
-            fontFeatures: const [FontFeature.tabularFigures()],
+        // FittedBox + maxLines:1 rather than just a smaller fontSize: "AM"/
+        // "PM" render wider than "오전"/"오후" did, and this guarantees the
+        // meridiem never wraps onto its own line away from the numbers —
+        // whatever the available width, it shrinks just enough to stay on
+        // one line instead of needing the exact size tuned by hand.
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            _digital(_now),
+            maxLines: 1,
+            style: GoogleFonts.notoSansKr(
+              fontSize: widget.digitalFontSize,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 1,
+              color: widget.ink,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
           ),
         ),
       ],

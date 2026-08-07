@@ -296,6 +296,7 @@ class _AlarmBadge extends StatelessWidget {
           const SizedBox(width: 5),
           Text(
             '$meridiem $hour12:$mm',
+            maxLines: 1,
             style: GoogleFonts.notoSansKr(
               fontSize: 10.5, // ~10% smaller now that it reads "AM/PM h:mm" instead of "오전 h:mm"
               color: palette.accent,

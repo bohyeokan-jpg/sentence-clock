@@ -234,6 +234,7 @@ class _AlarmSettingsScreenState extends ConsumerState<AlarmSettingsScreen> {
   Widget _timeLabel(AppThemePalette palette) {
     final mm = _minute.toString().padLeft(2, '0');
     return Text('${_isPm ? 'PM' : 'AM'} $_hour12:$mm',
+        maxLines: 1,
         style: GoogleFonts.notoSansKr(
             fontSize: 18, fontWeight: FontWeight.w600, color: palette.ink)); // ~10% smaller (AM/PM vs 오전/오후)
   }

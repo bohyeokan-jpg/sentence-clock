@@ -63,6 +63,7 @@ class SettingsScreen extends ConsumerWidget {
                           final meridiem = config.hour >= 12 ? 'PM' : 'AM';
                           return Text(
                             config.enabled ? '$meridiem $hour12:$mm' : '알람 꺼짐',
+                            maxLines: 1,
                             style: GoogleFonts.notoSansKr(fontSize: 12.5, color: palette.ink), // ~10% smaller (AM/PM vs 오전/오후)
                           );
                         },
