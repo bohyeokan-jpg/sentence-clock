@@ -74,13 +74,18 @@
     </LinearLayout>
 
     <!-- Bounded (0dp+weight, not wrap_content) so autosize has an actual
-         box to shrink the font within — same reasoning as widget_medium.xml. -->
+         box to shrink the font within — same reasoning as widget_medium.xml.
+         Side margins (not edge-to-edge match_parent) keep each line from
+         stretching the full widget width when the box is dragged tall —
+         reads like a normal paragraph instead of overly wide lines. -->
     <TextView
         android:id="@+id/widget_quote"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_marginTop="8dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
         android:text="문장을 불러오는 중이에요"
         android:textColor="#4A4038"
         android:autoSizeTextType="uniform"

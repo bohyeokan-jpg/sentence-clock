@@ -12,12 +12,17 @@
          with no help from the app. The alarm hand can't live inside it —
          AnalogClock only supports hour/minute drawables — so it's a
          same-bounds ImageView stacked on top instead, rotated in Kotlin via
-         setFloat(..., "setRotation", angle). Takes all the width the text
-         column doesn't need, and the full widget height. -->
+         setFloat(..., "setRotation", angle).
+
+         weight=11 against the text column's weight=9 (~55/45 split) instead
+         of a fixed dp width for the column — when the user drags the widget
+         wider, both sides now grow together instead of all the extra width
+         going to the clock alone and leaving the text column looking
+         cramped. -->
     <FrameLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_weight="11">
 
         <AnalogClock
             android:id="@+id/widget_clock_analog"
@@ -38,8 +43,9 @@
     </FrameLayout>
 
     <LinearLayout
-        android:layout_width="150dp"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_weight="9"
         android:layout_marginStart="8dp"
         android:orientation="vertical"
         android:gravity="center_vertical">
