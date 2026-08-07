@@ -50,25 +50,38 @@
              on its own. So the AM/PM label is a separate, small, plain
              TextView (widget_meridiem) that Kotlin sets in English —
              everything that actually needs to stay accurate every minute
-             (h:mm) is still the native, self-ticking part. -->
-        <TextView
-            android:id="@+id/widget_meridiem"
+             (h:mm) is still the native, self-ticking part. Text is set to
+             "A\nM" / "P\nM" (two lines) so it reads vertically, stacked
+             beside the time like a watch face. -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="AM"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#2B2620" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <TextClock
-            android:id="@+id/widget_clock_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:format12Hour="h:mm"
-            android:format24Hour="h:mm"
-            android:textSize="34sp"
-            android:textStyle="bold"
-            android:textColor="#2B2620" />
+            <TextView
+                android:id="@+id/widget_meridiem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="3dp"
+                android:text="A\nM"
+                android:gravity="center"
+                android:lineSpacingMultiplier="0.8"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#2B2620" />
+
+            <TextClock
+                android:id="@+id/widget_clock_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:format12Hour="h:mm"
+                android:format24Hour="h:mm"
+                android:textSize="34sp"
+                android:textStyle="bold"
+                android:textColor="#2B2620" />
+
+        </LinearLayout>
 
         <!-- Bounded (0dp+weight, not wrap_content) so autosize has an actual
              box to shrink the font within — it picks the largest size where

@@ -53,7 +53,7 @@ class MediumWidgetProvider : HomeWidgetProvider() {
             setTextViewText(R.id.widget_quote, quote)
             setTextViewText(
                 R.id.widget_meridiem,
-                if (Calendar.getInstance().get(Calendar.AM_PM) == Calendar.AM) "AM" else "PM",
+                if (Calendar.getInstance().get(Calendar.AM_PM) == Calendar.AM) "A\nM" else "P\nM",
             )
             applyAlarmHand(this, widgetData)
         }
