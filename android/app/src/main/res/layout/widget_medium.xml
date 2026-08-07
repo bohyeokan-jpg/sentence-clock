@@ -8,17 +8,34 @@
     android:background="@drawable/widget_background"
     android:padding="12dp">
 
-    <!-- Native view, so it keeps ticking on its own (system-driven, like
-         TextClock) with no help from the app — takes all the width the
-         text column doesn't need, and the full widget height. -->
-    <AnalogClock
-        android:id="@+id/widget_clock_analog"
+    <!-- AnalogClock keeps ticking on its own (system-driven, like TextClock)
+         with no help from the app. The alarm hand can't live inside it —
+         AnalogClock only supports hour/minute drawables — so it's a
+         same-bounds ImageView stacked on top instead, rotated in Kotlin via
+         setFloat(..., "setRotation", angle). Takes all the width the text
+         column doesn't need, and the full widget height. -->
+    <FrameLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:dial="@drawable/widget_clock_dial"
-        android:hand_hour="@drawable/widget_clock_hand_hour"
-        android:hand_minute="@drawable/widget_clock_hand_minute" />
+        android:layout_weight="1">
+
+        <AnalogClock
+            android:id="@+id/widget_clock_analog"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:dial="@drawable/widget_clock_dial"
+            android:hand_hour="@drawable/widget_clock_hand_hour"
+            android:hand_minute="@drawable/widget_clock_hand_minute" />
+
+        <ImageView
+            android:id="@+id/widget_clock_hand_alarm"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/widget_clock_hand_alarm"
+            android:visibility="gone"
+            android:contentDescription="@null" />
+
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="72dp"

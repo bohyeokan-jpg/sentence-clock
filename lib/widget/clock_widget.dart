@@ -23,6 +23,10 @@ class ClockWidget extends StatefulWidget {
   /// (see [AppThemePalette.clockDialInk]), not the digital text's ink.
   final Color? dialInk;
 
+  /// Alarm time to mark with a red hand, or null to hide it (alarm off).
+  final int? alarmHour;
+  final int? alarmMinute;
+
   const ClockWidget({
     super.key,
     required this.ink,
@@ -32,6 +36,8 @@ class ClockWidget extends StatefulWidget {
     this.digitalFontSize = 38,
     this.shape = ClockShape.circle,
     this.dialInk,
+    this.alarmHour,
+    this.alarmMinute,
   });
 
   @override
@@ -87,6 +93,8 @@ class _ClockWidgetState extends State<ClockWidget> {
               accent: widget.accent,
               faceFill: widget.faceFill,
               shape: widget.shape,
+              alarmHour: widget.alarmHour,
+              alarmMinute: widget.alarmMinute,
             ),
           ),
         ),

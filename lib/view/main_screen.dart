@@ -21,6 +21,9 @@ class MainScreen extends ConsumerWidget {
     final quoteState = ref.watch(quoteProvider);
     final alarmAsync = ref.watch(alarmProvider);
     final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    final alarmEnabled = alarmAsync.value?.enabled == true;
+    final alarmHour = alarmEnabled ? alarmAsync.value!.hour : null;
+    final alarmMinute = alarmEnabled ? alarmAsync.value!.minute : null;
 
     return Scaffold(
       backgroundColor: palette.background,
@@ -31,8 +34,20 @@ class MainScreen extends ConsumerWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: isLandscape ? 40 : 28, vertical: isLandscape ? 16 : 24),
               child: isLandscape
-                  ? _SplitBody(palette: palette, quoteState: quoteState, clockShape: clockShape)
-                  : _PortraitBody(palette: palette, quoteState: quoteState, clockShape: clockShape),
+                  ? _SplitBody(
+                      palette: palette,
+                      quoteState: quoteState,
+                      clockShape: clockShape,
+                      alarmHour: alarmHour,
+                      alarmMinute: alarmMinute,
+                    )
+                  : _PortraitBody(
+                      palette: palette,
+                      quoteState: quoteState,
+                      clockShape: clockShape,
+                      alarmHour: alarmHour,
+                      alarmMinute: alarmMinute,
+                    ),
             ),
             if (alarmAsync.value?.enabled == true)
               Positioned(
@@ -62,8 +77,16 @@ class _PortraitBody extends StatelessWidget {
   final AppThemePalette palette;
   final AsyncValue<QuoteState> quoteState;
   final ClockShape clockShape;
+  final int? alarmHour;
+  final int? alarmMinute;
 
-  const _PortraitBody({required this.palette, required this.quoteState, required this.clockShape});
+  const _PortraitBody({
+    required this.palette,
+    required this.quoteState,
+    required this.clockShape,
+    required this.alarmHour,
+    required this.alarmMinute,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +116,8 @@ class _PortraitBody extends StatelessWidget {
                     faceFill: palette.clockFace,
                     dialInk: palette.clockDialInk,
                     shape: clockShape,
+                    alarmHour: alarmHour,
+                    alarmMinute: alarmMinute,
                   ),
                   SizedBox(height: clockToQuoteGap),
                   Expanded(
@@ -129,8 +154,16 @@ class _SplitBody extends StatelessWidget {
   final AppThemePalette palette;
   final AsyncValue<QuoteState> quoteState;
   final ClockShape clockShape;
+  final int? alarmHour;
+  final int? alarmMinute;
 
-  const _SplitBody({required this.palette, required this.quoteState, required this.clockShape});
+  const _SplitBody({
+    required this.palette,
+    required this.quoteState,
+    required this.clockShape,
+    required this.alarmHour,
+    required this.alarmMinute,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -154,6 +187,8 @@ class _SplitBody extends StatelessWidget {
                     faceSize: clockSize,
                     digitalFontSize: compact ? 24 : 30,
                     shape: clockShape,
+                    alarmHour: alarmHour,
+                    alarmMinute: alarmMinute,
                   ),
                   SizedBox(width: compact ? 20 : 36),
                   Expanded(

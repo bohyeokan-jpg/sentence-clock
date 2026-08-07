@@ -16,14 +16,28 @@
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
-        <AnalogClock
-            android:id="@+id/widget_clock_analog"
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:dial="@drawable/widget_clock_dial"
-            android:hand_hour="@drawable/widget_clock_hand_hour"
-            android:hand_minute="@drawable/widget_clock_hand_minute" />
+            android:layout_weight="1">
+
+            <AnalogClock
+                android:id="@+id/widget_clock_analog"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:dial="@drawable/widget_clock_dial"
+                android:hand_hour="@drawable/widget_clock_hand_hour"
+                android:hand_minute="@drawable/widget_clock_hand_minute" />
+
+            <ImageView
+                android:id="@+id/widget_clock_hand_alarm"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/widget_clock_hand_alarm"
+                android:visibility="gone"
+                android:contentDescription="@null" />
+
+        </FrameLayout>
 
         <TextClock
             android:id="@+id/widget_clock_text"

@@ -65,6 +65,7 @@ class LargeWidgetProvider : HomeWidgetProvider() {
             setInt(R.id.widget_quote, "setMaxLines", maxLines)
             setTextViewText(R.id.widget_attribution, attribution)
             setViewVisibility(R.id.widget_attribution, if (showAttribution) View.VISIBLE else View.GONE)
+            applyAlarmHand(this, widgetData)
         }
         appWidgetManager.updateAppWidget(widgetId, views)
     }

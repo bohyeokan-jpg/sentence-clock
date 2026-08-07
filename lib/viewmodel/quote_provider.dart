@@ -35,7 +35,7 @@ class QuoteNotifier extends AsyncNotifier<QuoteState> {
     _lastMinute = now.minute;
     final quote = await _repo.quoteFor(category, previous: previous) ??
         const Quote(text: '오늘의 문장을 준비하고 있어요.', book: '', author: '');
-    unawaited(_widgetSync.sync(quote));
+    unawaited(_widgetSync.syncQuote(quote));
     return QuoteState(category: category, quote: quote);
   }
 

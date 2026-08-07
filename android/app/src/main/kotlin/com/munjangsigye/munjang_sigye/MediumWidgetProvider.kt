@@ -64,6 +64,7 @@ class MediumWidgetProvider : HomeWidgetProvider() {
             setTextViewText(R.id.widget_quote, quote)
             setTextViewTextSize(R.id.widget_quote, TypedValue.COMPLEX_UNIT_SP, textSizeSp)
             setInt(R.id.widget_quote, "setMaxLines", maxLines)
+            applyAlarmHand(this, widgetData)
         }
         appWidgetManager.updateAppWidget(widgetId, views)
     }

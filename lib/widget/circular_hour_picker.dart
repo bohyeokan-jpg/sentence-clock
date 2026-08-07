@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
+import 'analog_clock_painter.dart' show AnalogClockPainter;
+
 /// A draggable 12-position dial for picking an hour (1-12), matching the
 /// "다이얼로 설정" mode from the alarm screen mockup. Minutes and AM/PM are
 /// handled separately by the caller — this widget only owns the hour ring.
@@ -102,16 +104,17 @@ class _DialPainter extends CustomPainter {
     final handleAngle = (hour12 % 12) / 12 * 2 * pi;
     final handleR = radius - radius * 0.09;
     final handlePos = center + Offset(sin(handleAngle), -cos(handleAngle)) * handleR;
+    const handleColor = AnalogClockPainter.alarmRed;
 
     canvas.drawLine(
       center,
       handlePos,
       Paint()
-        ..color = accent
+        ..color = handleColor
         ..strokeWidth = radius * 0.02
         ..strokeCap = StrokeCap.round,
     );
-    canvas.drawCircle(handlePos, radius * 0.11, Paint()..color = accent);
+    canvas.drawCircle(handlePos, radius * 0.11, Paint()..color = handleColor);
     canvas.drawCircle(
       handlePos,
       radius * 0.11,

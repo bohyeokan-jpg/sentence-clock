@@ -15,12 +15,25 @@ class AnalogClockPainter extends CustomPainter {
   final Color faceFill;
   final ClockShape shape;
 
+  /// When set (alarm enabled), a red hand points at this hour/minute so the
+  /// set alarm time reads at a glance against the current time — same
+  /// convention as the hour hand (combined hour+minute angle), just a
+  /// fixed marker instead of something that ticks.
+  final int? alarmHour;
+  final int? alarmMinute;
+
+  /// Shared across the main clock, the widget's clock, and the alarm
+  /// dial's drag handle, so "red" always means "this is the alarm."
+  static const alarmRed = Color(0xFFE74C3C);
+
   AnalogClockPainter({
     required this.time,
     required this.ink,
     required this.accent,
     required this.faceFill,
     this.shape = ClockShape.circle,
+    this.alarmHour,
+    this.alarmMinute,
   });
 
   static const _numerals = {0: '12', 3: '3', 6: '6', 9: '9'};
@@ -96,6 +109,11 @@ class AnalogClockPainter extends CustomPainter {
     final minuteAngle = (time.minute + time.second / 60) / 60 * 2 * pi;
     final secondAngle = time.second / 60 * 2 * pi;
 
+    if (alarmHour != null && alarmMinute != null) {
+      final alarmAngle = ((alarmHour! % 12) + alarmMinute! / 60) / 12 * 2 * pi;
+      drawHand(alarmAngle, 0.56, 0.018, alarmRed);
+    }
+
     drawHand(hourAngle, 0.42, 0.03, ink);
     drawHand(minuteAngle, 0.62, 0.022, ink);
     drawHand(secondAngle, 0.68, 0.01, accent);
@@ -109,6 +127,8 @@ class AnalogClockPainter extends CustomPainter {
         oldDelegate.ink != ink ||
         oldDelegate.accent != accent ||
         oldDelegate.faceFill != faceFill ||
-        oldDelegate.shape != shape;
+        oldDelegate.shape != shape ||
+        oldDelegate.alarmHour != alarmHour ||
+        oldDelegate.alarmMinute != alarmMinute;
   }
 }
