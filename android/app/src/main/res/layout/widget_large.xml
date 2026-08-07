@@ -7,12 +7,13 @@
     android:background="@drawable/widget_background"
     android:padding="12dp">
 
-    <!-- Claims all the height the quote below doesn't need, so the clock
-         row grows with however big the user makes this widget. -->
+    <!-- Clock row and quote block split the available height by weight, so
+         both get an actual bounded box to work with instead of one being
+         wrap_content and silently starving (or overflowing) the other. -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
@@ -52,26 +53,41 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/widget_quote"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:layout_marginTop="10dp"
-        android:text="문장을 불러오는 중이에요"
-        android:textSize="30sp"
-        android:textColor="#2B2620"
-        android:maxLines="2"
-        android:ellipsize="end" />
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/widget_attribution"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text=""
-        android:textSize="18sp"
-        android:textColor="#8A6438"
-        android:maxLines="1"
-        android:ellipsize="end" />
+        <!-- Bounded (0dp+weight, not wrap_content) so autosize has an actual
+             box to shrink the font within — it picks the largest size where
+             the *whole* quote fits, wrapped across as many lines as it
+             needs, instead of a fixed size that clips long quotes with
+             an ellipsis. -->
+        <TextView
+            android:id="@+id/widget_quote"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="문장을 불러오는 중이에요"
+            android:textColor="#2B2620"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="10sp"
+            android:autoSizeMaxTextSize="30sp"
+            android:autoSizeStepGranularity="1sp" />
+
+        <TextView
+            android:id="@+id/widget_attribution"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text=""
+            android:textSize="18sp"
+            android:textColor="#8A6438"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+    </LinearLayout>
 
 </LinearLayout>

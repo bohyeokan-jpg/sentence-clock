@@ -4,7 +4,6 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
@@ -44,17 +43,13 @@ class LargeWidgetProvider : HomeWidgetProvider() {
         val attribution = widgetData.getString("widget_attribution", null) ?: ""
         val heightDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 300)
 
-        // Same idea as the medium widget: a taller tile shows more of the
-        // quote (and eventually the attribution line) instead of clipping
-        // it, rather than leaving the extra room empty. Base sizes roughly
-        // doubled from the original 13/14/16sp — the widget defaults to a
-        // bigger footprint now (see widget_large_info.xml) specifically so
-        // both the clock and this text could grow.
-        val (maxLines, textSizeSp, showAttribution) = when {
-            heightDp < 180 -> Triple(1, 26f, false)
-            heightDp < 260 -> Triple(2, 30f, true)
-            else -> Triple(3, 34f, true)
-        }
+        // The quote's own font size no longer needs any help here —
+        // widget_quote is autoSizeTextType=uniform in a bounded (0dp+weight)
+        // box now, so it re-shrinks to fit on its own (including on
+        // resize). The attribution line is small and fixed-size, so it's
+        // still worth hiding entirely below a height where it'd just get
+        // squeezed out anyway.
+        val showAttribution = heightDp >= 180
 
         // The clock itself is a native AnalogClock (see widget_large.xml) —
         // it ticks on its own, no data or per-update work needed here.
@@ -64,8 +59,6 @@ class LargeWidgetProvider : HomeWidgetProvider() {
                 HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java),
             )
             setTextViewText(R.id.widget_quote, quote)
-            setTextViewTextSize(R.id.widget_quote, TypedValue.COMPLEX_UNIT_SP, textSizeSp)
-            setInt(R.id.widget_quote, "setMaxLines", maxLines)
             setTextViewText(R.id.widget_attribution, attribution)
             setViewVisibility(R.id.widget_attribution, if (showAttribution) View.VISIBLE else View.GONE)
             applyAlarmHand(this, widgetData)

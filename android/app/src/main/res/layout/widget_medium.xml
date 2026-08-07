@@ -54,16 +54,23 @@
             android:textStyle="bold"
             android:textColor="#2B2620" />
 
+        <!-- Bounded (0dp+weight, not wrap_content) so autosize has an actual
+             box to shrink the font within — it picks the largest size where
+             the *whole* quote fits, wrapped across as many lines as it
+             needs, instead of a fixed size that clips long quotes with
+             an ellipsis. -->
         <TextView
             android:id="@+id/widget_quote"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:layout_marginTop="6dp"
             android:text="문장을 불러오는 중이에요"
-            android:textSize="26sp"
             android:textColor="#4A4038"
-            android:maxLines="3"
-            android:ellipsize="end" />
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="8sp"
+            android:autoSizeMaxTextSize="26sp"
+            android:autoSizeStepGranularity="1sp" />
 
     </LinearLayout>
 

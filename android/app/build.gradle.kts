@@ -24,8 +24,9 @@ android {
         applicationId = "com.munjangsigye.munjang_sigye"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        // home_widget pulls in androidx.work, which requires 23+.
-        minSdk = 23
+        // 26+ for TextView's android:autoSizeTextType (widget quote text)
+        // — home_widget/androidx.work only needed 23+.
+        minSdk = 26
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

@@ -4,7 +4,6 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.TypedValue
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetPlugin
@@ -17,14 +16,14 @@ class MediumWidgetProvider : HomeWidgetProvider() {
         appWidgetIds: IntArray,
         widgetData: SharedPreferences,
     ) {
-        appWidgetIds.forEach { widgetId ->
-            apply(context, appWidgetManager, widgetId, widgetData, appWidgetManager.getAppWidgetOptions(widgetId))
-        }
+        appWidgetIds.forEach { widgetId -> apply(context, appWidgetManager, widgetId, widgetData) }
     }
 
-    // Fires whenever the user resizes this widget on their home screen, so
-    // the quote can show more or fewer lines instead of staying clipped at
-    // whatever size it was first placed at.
+    // Resizing the widget still needs a fresh RemoteViews to pick up the
+    // alarm hand / click intent again, but the quote's own font size no
+    // longer needs any help here — widget_quote is autoSizeTextType=uniform
+    // in a bounded (0dp+weight) box now, so it re-shrinks to fit on its own
+    // whenever its bounds change, including on resize.
     override fun onAppWidgetOptionsChanged(
         context: Context,
         appWidgetManager: AppWidgetManager,
@@ -32,7 +31,7 @@ class MediumWidgetProvider : HomeWidgetProvider() {
         newOptions: Bundle,
     ) {
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
-        apply(context, appWidgetManager, appWidgetId, HomeWidgetPlugin.getData(context), newOptions)
+        apply(context, appWidgetManager, appWidgetId, HomeWidgetPlugin.getData(context))
     }
 
     private fun apply(
@@ -40,22 +39,8 @@ class MediumWidgetProvider : HomeWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         widgetId: Int,
         widgetData: SharedPreferences,
-        options: Bundle,
     ) {
         val quote = widgetData.getString("widget_quote", null) ?: "문장을 불러오는 중이에요"
-        val heightDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 220)
-
-        // More vertical room -> more lines of the quote get to show instead
-        // of being clipped, with a slightly bigger font so a taller tile
-        // doesn't just look like empty space was left over. Base sizes
-        // roughly tripled from the original 10/11/12.5sp — the whole widget
-        // defaults to a bigger footprint now (see widget_medium_info.xml)
-        // specifically so both the clock and this text could grow.
-        val (maxLines, textSizeSp) = when {
-            heightDp < 100 -> 1 to 22f
-            heightDp < 170 -> 2 to 26f
-            else -> 3 to 30f
-        }
 
         // The clock itself is a native AnalogClock (see widget_medium.xml) —
         // it ticks on its own, no data or per-update work needed here.
@@ -65,8 +50,6 @@ class MediumWidgetProvider : HomeWidgetProvider() {
                 HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java),
             )
             setTextViewText(R.id.widget_quote, quote)
-            setTextViewTextSize(R.id.widget_quote, TypedValue.COMPLEX_UNIT_SP, textSizeSp)
-            setInt(R.id.widget_quote, "setMaxLines", maxLines)
             applyAlarmHand(this, widgetData)
         }
         appWidgetManager.updateAppWidget(widgetId, views)
