@@ -23,7 +23,7 @@ class _AlarmRingingScreenState extends ConsumerState<AlarmRingingScreen> {
     if (_dismissing) return;
     _dismissing = true;
     await Alarm.stop(widget.alarmSettings.id);
-    await ref.read(alarmProvider.notifier).reschedule();
+    await ref.read(alarmProvider.notifier).reschedule(widget.alarmSettings.id);
     if (mounted) Navigator.of(context).pop();
   }
 

@@ -19,11 +19,13 @@ class MainScreen extends ConsumerWidget {
     final palette = ref.watch(themePaletteProvider);
     final clockShape = ref.watch(clockShapeProvider);
     final quoteState = ref.watch(quoteProvider);
-    final alarmAsync = ref.watch(alarmProvider);
+    // The clock only has room for one red hand — this is the topmost
+    // *enabled* alarm out of however many of the up-to-3 slots are on.
+    final topAlarm = ref.watch(topAlarmProvider);
     final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
-    final alarmEnabled = alarmAsync.value?.enabled == true;
-    final alarmHour = alarmEnabled ? alarmAsync.value!.hour : null;
-    final alarmMinute = alarmEnabled ? alarmAsync.value!.minute : null;
+    final alarmEnabled = topAlarm?.enabled == true;
+    final alarmHour = alarmEnabled ? topAlarm!.hour : null;
+    final alarmMinute = alarmEnabled ? topAlarm!.minute : null;
 
     return Scaffold(
       backgroundColor: palette.background,
@@ -49,11 +51,11 @@ class MainScreen extends ConsumerWidget {
                       alarmMinute: alarmMinute,
                     ),
             ),
-            if (alarmAsync.value?.enabled == true)
+            if (alarmEnabled)
               Positioned(
                 top: isLandscape ? 4 : 0,
                 left: 0,
-                child: _AlarmBadge(palette: palette, hour: alarmAsync.value!.hour, minute: alarmAsync.value!.minute),
+                child: _AlarmBadge(palette: palette, hour: topAlarm!.hour, minute: topAlarm.minute),
               ),
             Positioned(
               top: isLandscape ? 4 : 0,

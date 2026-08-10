@@ -35,10 +35,13 @@ class WidgetSyncService {
     await _updateAll();
   }
 
-  Future<void> syncAlarm(AlarmConfig config) async {
-    await HomeWidget.saveWidgetData<bool>('widget_alarm_enabled', config.enabled);
-    await HomeWidget.saveWidgetData<int>('widget_alarm_hour', config.hour);
-    await HomeWidget.saveWidgetData<int>('widget_alarm_minute', config.minute);
+  /// [config] is the topmost *enabled* alarm among however many are set (see
+  /// alarm_provider.dart's topEnabledAlarm) — null if none are on, since the
+  /// widget's single red hand can only ever point at one.
+  Future<void> syncAlarm(AlarmConfig? config) async {
+    await HomeWidget.saveWidgetData<bool>('widget_alarm_enabled', config?.enabled ?? false);
+    await HomeWidget.saveWidgetData<int>('widget_alarm_hour', config?.hour ?? 0);
+    await HomeWidget.saveWidgetData<int>('widget_alarm_minute', config?.minute ?? 0);
     await _updateAll();
   }
 

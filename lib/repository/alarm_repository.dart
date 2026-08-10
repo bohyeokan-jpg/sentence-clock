@@ -4,46 +4,60 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../model/alarm_config.dart';
 import '../model/alarm_sound.dart';
 
-/// Persists the single daily alarm and schedules/cancels it with the
-/// `alarm` plugin. Since there's no weekday picker in this MVP, a fired
-/// alarm is rescheduled for the same time the next day from the ringing
-/// screen (see AlarmRingingScreen).
+/// Persists up to [maxAlarms] daily alarms (slot 0/1/2) and schedules/cancels
+/// each with the `alarm` plugin under its own id, so all three can be armed
+/// at once. Since there's no weekday picker in this MVP, a fired alarm is
+/// rescheduled for the same time the next day from the ringing screen (see
+/// AlarmRingingScreen) — using the id the `alarm` plugin reports for the one
+/// that actually rang, so the right slot gets rescheduled.
 class AlarmRepository {
-  static const _enabledKey = 'alarm_enabled';
-  static const _hourKey = 'alarm_hour';
-  static const _minuteKey = 'alarm_minute';
-  static const _soundKey = 'alarm_sound_id';
-  static const alarmId = 1;
+  static const maxAlarms = 3;
 
-  Future<AlarmConfig> load() async {
+  /// Slot index -> the id the `alarm` plugin schedules/reports it under.
+  static int alarmIdFor(int index) => index + 1;
+
+  Future<List<AlarmConfig>> load() async {
     final prefs = await SharedPreferences.getInstance();
-    return AlarmConfig(
-      enabled: prefs.getBool(_enabledKey) ?? AlarmConfig.fallback.enabled,
-      hour: prefs.getInt(_hourKey) ?? AlarmConfig.fallback.hour,
-      minute: prefs.getInt(_minuteKey) ?? AlarmConfig.fallback.minute,
-      soundId: prefs.getString(_soundKey) ?? AlarmConfig.fallback.soundId,
-    );
+    return List.generate(maxAlarms, (i) {
+      // Slot 0 falls back to the old un-suffixed keys from before multiple
+      // alarms existed, so an already-set single alarm survives the upgrade
+      // instead of silently reverting to the fallback default.
+      final enabled = prefs.getBool('alarm_enabled_$i') ??
+          (i == 0 ? prefs.getBool('alarm_enabled') : null) ??
+          AlarmConfig.fallback.enabled;
+      final hour = prefs.getInt('alarm_hour_$i') ??
+          (i == 0 ? prefs.getInt('alarm_hour') : null) ??
+          AlarmConfig.fallback.hour;
+      final minute = prefs.getInt('alarm_minute_$i') ??
+          (i == 0 ? prefs.getInt('alarm_minute') : null) ??
+          AlarmConfig.fallback.minute;
+      final soundId = prefs.getString('alarm_sound_id_$i') ??
+          (i == 0 ? prefs.getString('alarm_sound_id') : null) ??
+          AlarmConfig.fallback.soundId;
+      return AlarmConfig(enabled: enabled, hour: hour, minute: minute, soundId: soundId);
+    });
   }
 
-  Future<void> save(AlarmConfig config) async {
+  Future<void> saveAt(int index, AlarmConfig config) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_enabledKey, config.enabled);
-    await prefs.setInt(_hourKey, config.hour);
-    await prefs.setInt(_minuteKey, config.minute);
-    await prefs.setString(_soundKey, config.soundId);
+    await prefs.setBool('alarm_enabled_$index', config.enabled);
+    await prefs.setInt('alarm_hour_$index', config.hour);
+    await prefs.setInt('alarm_minute_$index', config.minute);
+    await prefs.setString('alarm_sound_id_$index', config.soundId);
 
+    final id = alarmIdFor(index);
     if (config.enabled) {
-      await _schedule(config);
+      await _schedule(id, config);
     } else {
-      await Alarm.stop(alarmId);
+      await Alarm.stop(id);
     }
   }
 
-  Future<void> _schedule(AlarmConfig config) async {
+  Future<void> _schedule(int id, AlarmConfig config) async {
     final sound = alarmSoundById(config.soundId);
     await Alarm.set(
       alarmSettings: AlarmSettings(
-        id: alarmId,
+        id: id,
         dateTime: _nextOccurrence(config.hour, config.minute),
         assetAudioPath: sound.assetPath,
         loopAudio: true,
@@ -57,11 +71,12 @@ class AlarmRepository {
     );
   }
 
-  /// Reschedules the same alarm for the next day — called after the
-  /// ringing screen's stop button, so the daily alarm keeps repeating.
-  Future<void> rescheduleForTomorrow(AlarmConfig config) async {
+  /// Reschedules one fired alarm (identified by the id the `alarm` plugin
+  /// rang it under) for the next day — called after the ringing screen's
+  /// stop button, so each daily alarm keeps repeating independently.
+  Future<void> rescheduleForTomorrow(int id, AlarmConfig config) async {
     if (!config.enabled) return;
-    await _schedule(config);
+    await _schedule(id, config);
   }
 
   DateTime _nextOccurrence(int hour, int minute) {

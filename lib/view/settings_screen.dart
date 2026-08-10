@@ -57,12 +57,18 @@ class SettingsScreen extends ConsumerWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: alarmAsync.when(
-                        data: (config) {
-                          final hour12 = config.hour % 12 == 0 ? 12 : config.hour % 12;
-                          final mm = config.minute.toString().padLeft(2, '0');
-                          final meridiem = config.hour >= 12 ? 'PM' : 'AM';
+                        data: (alarms) {
+                          final enabledCount = alarms.where((a) => a.enabled).length;
+                          final top = topEnabledAlarm(alarms);
+                          if (top == null) {
+                            return Text('알람 꺼짐', style: GoogleFonts.notoSansKr(fontSize: 12.5, color: palette.ink));
+                          }
+                          final hour12 = top.hour % 12 == 0 ? 12 : top.hour % 12;
+                          final mm = top.minute.toString().padLeft(2, '0');
+                          final meridiem = top.hour >= 12 ? 'PM' : 'AM';
+                          final extra = enabledCount > 1 ? ' 외 ${enabledCount - 1}개' : '';
                           return Text(
-                            config.enabled ? '$meridiem $hour12:$mm' : '알람 꺼짐',
+                            '$meridiem $hour12:$mm$extra',
                             maxLines: 1,
                             style: GoogleFonts.notoSansKr(fontSize: 12.5, color: palette.ink), // ~10% smaller (AM/PM vs 오전/오후)
                           );
