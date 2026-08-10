@@ -11,54 +11,88 @@
     android:background="@drawable/widget_background"
     android:padding="10dp">
 
+    <!-- weight="5" here vs. the quote's weight="4" below — gives the clock
+         row more of the available height than a plain 1:1 split, since the
+         clock (a square, per AnalogClock's own uniform-scale drawing) is
+         always bounded by whichever of width/height is smaller, and this
+         row's height was that binding constraint. -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:layout_weight="5"
+        android:orientation="horizontal">
 
-        <!-- AnalogClock keeps ticking on its own (system-driven, like
-             TextClock) with no help from the app. The alarm hand can't
-             live inside it — AnalogClock only supports hour/minute
-             drawables — so it's a same-bounds ImageView stacked on top
-             instead, rotated in Kotlin via setFloat(..., "setRotation",
-             angle). -->
+        <!-- Clock section: its own column (not just "whatever's left after
+             the time column"), so the clock is centered *within this
+             section* specifically, both axes — matches the time section
+             below being centered within its own space instead of the two
+             floating at arbitrary positions relative to each other. -->
         <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="6.8">
 
+            <!-- AnalogClock keeps ticking on its own (system-driven, like
+                 TextClock) with no help from the app. The dial drawable's
+                 own canvas is now a genuine 4:3 rectangle (not a square
+                 letterboxed inside a wide box, which is what match_parent
+                 gave before — width and height diverged so it always got
+                 capped by whichever was smaller). wrap_content instead
+                 lets AnalogClock's own onMeasure size the view to that same
+                 4:3 aspect, scaled up to the largest box that fits this
+                 column — i.e. it actually fills the column now instead of
+                 floating inside it. gravity="center" centers that box in
+                 both axes if the column isn't exactly 4:3 itself.
+                 The alarm hand can't live inside AnalogClock — it only
+                 supports hour/minute/second drawables — so it's a same-
+                 bounds ImageView stacked on top instead, rotated in Kotlin
+                 via setFloat(..., "setRotation", angle). Its own drawable
+                 is generated on the identical 1600x1200 canvas as the dial,
+                 so adjustViewBounds resolves it to the exact same size as
+                 the AnalogClock next to it without any manual syncing. -->
             <AnalogClock
                 android:id="@+id/widget_clock_analog"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:dial="@drawable/widget_clock_dial"
                 android:hand_hour="@drawable/widget_clock_hand_hour"
-                android:hand_minute="@drawable/widget_clock_hand_minute" />
+                android:hand_minute="@drawable/widget_clock_hand_minute"
+                android:hand_second="@drawable/widget_clock_hand_second" />
 
             <ImageView
                 android:id="@+id/widget_clock_hand_alarm"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
                 android:src="@drawable/widget_clock_hand_alarm"
                 android:visibility="gone"
                 android:contentDescription="@null" />
 
         </FrameLayout>
 
-        <!-- TextClock's "a" (AM/PM) symbol is locale-driven — on a Korean
+        <!-- Time section: its own column too, with gravity="center" so the
+             AM/PM + digital time sit in the middle of this section instead
+             of hugging its left edge (which is what happened when this was
+             just a wrap_content block trailing right after the clock).
+             weight="3.2" (was "2" out of a clock:time ratio of 3:2, i.e.
+             this column's own share of the row is now 20% smaller than
+             before — 0.32 vs 0.4) shrinks this column itself; the text
+             inside stays its original size, gravity="center" just has
+             less room to center it within now.
+             TextClock's "a" (AM/PM) symbol is locale-driven — on a Korean
              device it always renders "오전/오후" no matter what pattern we
-             ask for, with no way to force English while it keeps ticking
-             on its own. So the AM/PM label is a separate, plain TextView
-             that Kotlin sets in English — everything that actually needs
-             to stay accurate every minute (h:mm) is still the native,
-             self-ticking part. -->
+             ask for, with no way to force English while it keeps ticking on
+             its own. So the AM/PM label is a separate, plain TextView that
+             Kotlin sets in English — everything that actually needs to stay
+             accurate every minute (h:mm) is still the native, self-ticking
+             part. -->
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:gravity="center_vertical">
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3.2"
+            android:gravity="center">
 
             <TextView
                 android:id="@+id/widget_meridiem"
@@ -93,12 +127,13 @@
         android:id="@+id/widget_quote"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="4"
         android:layout_marginTop="8dp"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
         android:text="문장을 불러오는 중이에요"
         android:textColor="#4A4038"
+        android:gravity="center"
         android:autoSizeTextType="uniform"
         android:autoSizeMinTextSize="8sp"
         android:autoSizeMaxTextSize="26sp"
