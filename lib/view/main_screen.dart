@@ -88,13 +88,15 @@ class MainScreen extends ConsumerWidget {
 /// Settings — picking one here also updates Settings' own selection (same
 /// provider), so the two stay in sync either direction.
 ///
-/// A dropdown menu (`PopupMenuButton`) rather than the full-height modal
-/// bottom sheet this used to be — in landscape the screen is only ~360-420px
-/// tall, and the sheet's title + subtitle + 5 options didn't all fit, with
-/// no scrolling to reach the rest. A dropdown sizes itself to the menu's
-/// own content and Flutter keeps it within the screen bounds (scrolling
-/// internally if it still doesn't fit), so it works the same in both
-/// orientations.
+/// A bottom sheet with an explicit height cap + `ListView`, not a bare
+/// `PopupMenuButton` (tried previously) or a plain-`Column` modal sheet
+/// (tried before that) — both silently clipped the last option(s) in
+/// landscape, where the screen is only ~360-420px tall, because neither
+/// guaranteed its content actually fit. Capping at 70% of *whatever*
+/// height is available right now (`MediaQuery.sizeOf(context).height`,
+/// read fresh on every open) and handing the rest to a scrollable
+/// `ListView` means every option is reachable regardless of orientation or
+/// how many backgrounds get added later.
 class _DreamBackgroundDropdown extends StatelessWidget {
   final WidgetRef ref;
   final AppThemePalette palette;
@@ -103,26 +105,33 @@ class _DreamBackgroundDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final current = ref.read(dreamBackgroundProvider);
-    return PopupMenuButton<DreamBackgroundId>(
+    return IconButton(
       tooltip: '화면보호기 실행',
       icon: Icon(Icons.play_circle_outline, color: palette.ink.withValues(alpha: 0.55)),
-      color: palette.background,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      itemBuilder: (menuContext) => DreamBackgroundId.values.map((id) {
-        final option = dreamBackgroundOptions[id]!;
-        final selected = id == current;
-        return PopupMenuItem<DreamBackgroundId>(
-          value: id,
-          child: Row(
-            children: [
-              Icon(
+      onPressed: () => _openPicker(context),
+    );
+  }
+
+  void _openPicker(BuildContext context) {
+    final current = ref.read(dreamBackgroundProvider);
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: palette.background,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(18))),
+      constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.7),
+      builder: (sheetContext) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          children: DreamBackgroundId.values.map((id) {
+            final option = dreamBackgroundOptions[id]!;
+            final selected = id == current;
+            return ListTile(
+              leading: Icon(
                 selected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-                size: 18,
                 color: selected ? palette.accent : palette.ink.withValues(alpha: 0.4),
               ),
-              const SizedBox(width: 10),
-              Text(
+              title: Text(
                 option.label,
                 style: GoogleFonts.notoSansKr(
                   fontSize: 14.5,
@@ -130,14 +139,15 @@ class _DreamBackgroundDropdown extends StatelessWidget {
                   fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
-            ],
-          ),
-        );
-      }).toList(),
-      onSelected: (id) {
-        ref.read(dreamBackgroundProvider.notifier).select(id);
-        dreamChannel.invokeMethod('openDreamPreview');
-      },
+              onTap: () {
+                ref.read(dreamBackgroundProvider.notifier).select(id);
+                Navigator.of(sheetContext).pop();
+                dreamChannel.invokeMethod('openDreamPreview');
+              },
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
 }
