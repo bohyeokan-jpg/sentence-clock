@@ -31,7 +31,7 @@ class SettingsScreen extends ConsumerWidget {
         iconTheme: IconThemeData(color: palette.ink),
         title: Text('설정', style: GoogleFonts.notoSerifKr(color: palette.ink, fontSize: 18)),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
