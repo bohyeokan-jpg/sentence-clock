@@ -1,7 +1,7 @@
 // Regenerates the app's launcher icon (legacy + Android 12+ adaptive
-// foreground, both size sets) from a single composition: a small clock
-// above two short "lines of text" — the app's own layout (clock, then a
-// quote) distilled into a mark, using the same bold ink/background swap as
+// foreground, both size sets) from a single composition: a clean analog
+// clock face — hands set to 10:10, the conventional "clock icon" pose —
+// filling most of the icon, using the same bold ink/background swap as
 // AppThemePalette.clockFace / clockDialInk in lib/model/app_theme.dart, so
 // the icon and the in-app clock face read as the same idea.
 //
@@ -44,8 +44,8 @@ const _foregroundSizes = {
 const _supersample = 4;
 
 void main() {
-  const legacyScale = 1.7; // fills most of the square (opaque background)
-  const foregroundScale = 1.15; // stays inside the ~66/108dp adaptive-icon safe zone
+  const legacyScale = 0.82; // clock diameter as a fraction of the canvas (opaque background)
+  const foregroundScale = 0.54; // stays inside the ~66/108dp adaptive-icon safe zone
 
   for (final entry in _legacySizes.entries) {
     final icon = _render(entry.value, legacyScale, transparent: false);
@@ -77,26 +77,17 @@ void _write(img.Image icon, String densityDir, String fileName) {
   File('${dir.path}/$fileName').writeAsBytesSync(img.encodePng(icon));
 }
 
-/// A small clock above two short "lines of text". The whole group is
-/// centered so its vertical midpoint sits exactly at 50% of the canvas
-/// (`cy`); `cx` is untouched, so the horizontal position is always the
-/// canvas's own center.
+/// One clean analog clock face, centered on the canvas. `scale` sets the
+/// clock's diameter as a fraction of the canvas.
 void _drawComposition(img.Image icon, double cx, double cy, double canvas, double scale) {
-  final s = canvas * scale;
+  final clockR = canvas * scale / 2;
 
-  final clockR = s * 0.135;
-  final gapToBars = s * 0.075;
-  final barH = s * 0.042;
-  final barGap = s * 0.032;
-  const widths = [0.28, 0.16];
-
-  final totalH = clockR * 2 + gapToBars + widths.length * barH + (widths.length - 1) * barGap;
-  final top = cy - totalH / 2;
-  final clockCy = top + clockR;
-
-  // Clock: a solid ink disc so the face reads as its own shape against the
-  // cream background, with cream hands cut into it.
-  _fillCircle(icon, cx, clockCy, clockR, _ink);
+  // Face: a solid ink rounded square (matching ClockShape.square — the
+  // shape currently applied on the main screen — rather than a circle) so
+  // the face reads as its own shape against the cream background, with
+  // cream hands cut into it. Corner radius follows the same 0.22-of-half-
+  // width ratio AnalogClockPainter uses for ClockShape.square.
+  _fillRoundedRect(icon, cx, cy, clockR * 2, clockR * 2, clockR * 0.22, _ink);
 
   // Four cardinal tick marks (12/3/6/9) for a classic clock-face read,
   // rather than a bare disc with just two hands. Deliberately much bolder
@@ -104,32 +95,26 @@ void _drawComposition(img.Image icon, double cx, double cy, double canvas, doubl
   // face, this has to still register at a 48px launcher icon.
   for (final tickAngle in [0.0, 90.0, 180.0, 270.0]) {
     final a = tickAngle * math.pi / 180;
-    final outer = clockR * 0.92;
-    final inner = clockR * 0.66;
-    final x0 = cx + inner * math.sin(a), y0 = clockCy - inner * math.cos(a);
-    final x1 = cx + outer * math.sin(a), y1 = clockCy - outer * math.cos(a);
-    _thickLine(icon, x0, y0, x1, y1, clockR * 0.11, _cream);
+    final outer = clockR * 0.86;
+    final inner = clockR * 0.62;
+    final x0 = cx + inner * math.sin(a), y0 = cy - inner * math.cos(a);
+    final x1 = cx + outer * math.sin(a), y1 = cy - outer * math.cos(a);
+    _thickLine(icon, x0, y0, x1, y1, clockR * 0.10, _cream);
   }
 
   void hand(double angleDeg, double lengthFrac, double widthFrac, Rgb color) {
     final a = angleDeg * math.pi / 180;
     final length = clockR * lengthFrac;
     final ex = cx + length * math.sin(a);
-    final ey = clockCy - length * math.cos(a);
-    _thickLine(icon, cx, clockCy, ex, ey, math.max(1, s * widthFrac), color);
+    final ey = cy - length * math.cos(a);
+    _thickLine(icon, cx, cy, ex, ey, math.max(1, clockR * widthFrac), color);
   }
 
-  hand(305.0, 0.50, 0.058, _cream); // hour -> 10
-  hand(60.0, 0.70, 0.040, _cream); // minute -> 2
-  _fillCircle(icon, cx, clockCy, s * 0.044, _gold);
-
-  // Two lines of "text" (a quote), below the clock.
-  var y = clockCy + clockR + gapToBars;
-  for (final wFrac in widths) {
-    final bw = s * wFrac;
-    _fillRoundedRect(icon, cx, y + barH / 2, bw, barH, barH / 2, _gold);
-    y += barH + barGap;
-  }
+  // Hands set to 10:10 — the conventional "clock icon" pose, symmetric and
+  // legible even at launcher-icon size.
+  hand(305.0, 0.54, 0.075, _cream); // hour -> 10
+  hand(60.0, 0.74, 0.052, _cream); // minute -> 2
+  _fillCircle(icon, cx, cy, clockR * 0.09, _gold);
 }
 
 void _setPx(img.Image icon, int x, int y, Rgb c) {
