@@ -1,9 +1,15 @@
-// Regenerates the app's launcher icon (legacy + Android 12+ adaptive
-// foreground, both size sets) from a single composition: a clean analog
-// clock face — hands set to 10:10, the conventional "clock icon" pose —
-// filling most of the icon, using the same bold ink/background swap as
-// AppThemePalette.clockFace / clockDialInk in lib/model/app_theme.dart, so
-// the icon and the in-app clock face read as the same idea.
+// Regenerates the app's launcher icon from a single composition: a clean
+// analog clock face — hands set to 10:10, the conventional "clock icon"
+// pose — filling most of the icon, using the same bold ink/background swap
+// as AppThemePalette.clockFace / clockDialInk in lib/model/app_theme.dart,
+// so the icon and the in-app clock face read as the same idea.
+//
+// Legacy-only, deliberately: there used to be an Android 12+ adaptive-icon
+// variant (mipmap-anydpi-v26/ic_launcher.xml, background color + this same
+// composition as the transparent foreground layer), but that hands the
+// final silhouette to the launcher — ours was rendering it as a circle
+// instead of the rounded square drawn here. Removed so the launcher has
+// nothing to re-mask and just shows this PNG's own shape.
 //
 // Run with: dart run tool/generate_icon.dart
 // Writes directly into android/app/src/main/res/mipmap-*/ — there's no
@@ -30,44 +36,36 @@ const _legacySizes = {
   'mipmap-xxxhdpi': 192,
 };
 
-const _foregroundSizes = {
-  'mipmap-mdpi': 108,
-  'mipmap-hdpi': 162,
-  'mipmap-xhdpi': 216,
-  'mipmap-xxhdpi': 324,
-  'mipmap-xxxhdpi': 432,
-};
-
 // Rendered at 4x and downsampled on the way out, since this package draws
 // with hard pixel edges (no built-in anti-aliasing) — supersampling is what
 // keeps the disc and rounded corners smooth instead of jagged.
 const _supersample = 4;
 
 void main() {
-  const legacyScale = 0.82; // clock diameter as a fraction of the canvas (opaque background)
-  const foregroundScale = 0.54; // stays inside the ~66/108dp adaptive-icon safe zone
+  // Large enough that the icon doesn't read as smaller than its neighbors,
+  // small enough to leave the cream backdrop as a clearly visible ring
+  // rather than a sliver that only shows up under magnification.
+  const legacyScale = 0.94;
 
   for (final entry in _legacySizes.entries) {
-    final icon = _render(entry.value, legacyScale, transparent: false);
+    final icon = _render(entry.value, legacyScale);
     _write(icon, entry.key, 'ic_launcher.png');
-  }
-  for (final entry in _foregroundSizes.entries) {
-    final icon = _render(entry.value, foregroundScale, transparent: true);
-    _write(icon, entry.key, 'ic_launcher_foreground.png');
   }
 
   // ignore: avoid_print
-  print('Wrote launcher icons to $_resRoot/mipmap-*/');
+  print('Wrote launcher icon to $_resRoot/mipmap-*/');
 }
 
-img.Image _render(int sizePx, double scale, {required bool transparent}) {
+img.Image _render(int sizePx, double scale) {
   final size = sizePx * _supersample;
   final icon = img.Image(width: size, height: size, numChannels: 4);
-  if (transparent) {
-    img.fill(icon, color: img.ColorRgba8(0, 0, 0, 0));
-  } else {
-    img.fill(icon, color: img.ColorRgba8(_cream.r, _cream.g, _cream.b, 255));
-  }
+  // Always start transparent, even for the legacy (opaque-looking) icon —
+  // its cream backdrop is now drawn as an explicit rounded shape in
+  // _drawComposition rather than a flat img.fill() covering the whole
+  // square bitmap. A flat fill left sharp, un-rounded corners sitting
+  // behind the dark face's rounded ones, which is exactly the "icon shape
+  // and outer white shape don't match" mismatch this was asked to fix.
+  img.fill(icon, color: img.ColorRgba8(0, 0, 0, 0));
   _drawComposition(icon, size / 2, size / 2, size.toDouble(), scale);
   return img.copyResize(icon, width: sizePx, height: sizePx, interpolation: img.Interpolation.average);
 }
@@ -80,14 +78,26 @@ void _write(img.Image icon, String densityDir, String fileName) {
 /// One clean analog clock face, centered on the canvas. `scale` sets the
 /// clock's diameter as a fraction of the canvas.
 void _drawComposition(img.Image icon, double cx, double cy, double canvas, double scale) {
-  final clockR = canvas * scale / 2;
+  // Backdrop: a cream rounded rect spanning almost the full canvas, not a
+  // flat fill over the whole square bitmap. A flat fill leaves sharp,
+  // un-rounded corners sitting behind the dark face's rounded ones — two
+  // different silhouettes nested together, which read as inconsistent.
+  // Deriving the face's own corner radius below from *this* shape (same
+  // radius, shrunk by the same margin that shrinks its size) keeps
+  // whatever cream margin is left a uniform-width ring following one
+  // continuous curve, instead of two unrelated ones.
+  final outerR = canvas * 0.98 / 2;
+  final outerCorner = outerR * 0.26;
+  _fillRoundedRect(icon, cx, cy, outerR * 2, outerR * 2, outerCorner, _cream);
 
   // Face: a solid ink rounded square (matching ClockShape.square — the
   // shape currently applied on the main screen — rather than a circle) so
-  // the face reads as its own shape against the cream background, with
-  // cream hands cut into it. Corner radius follows the same 0.22-of-half-
-  // width ratio AnalogClockPainter uses for ClockShape.square.
-  _fillRoundedRect(icon, cx, cy, clockR * 2, clockR * 2, clockR * 0.22, _ink);
+  // the face reads as its own shape against the cream backdrop, with cream
+  // hands cut into it.
+  final clockR = canvas * scale / 2;
+  final margin = outerR - clockR;
+  final innerCorner = math.max(0.0, outerCorner - margin);
+  _fillRoundedRect(icon, cx, cy, clockR * 2, clockR * 2, innerCorner, _ink);
 
   // Four cardinal tick marks (12/3/6/9) for a classic clock-face read,
   // rather than a bare disc with just two hands. Deliberately much bolder
