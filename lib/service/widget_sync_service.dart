@@ -1,6 +1,7 @@
 import 'package:home_widget/home_widget.dart';
 
 import '../model/alarm_config.dart';
+import '../model/dream_background.dart';
 import '../model/quote.dart';
 
 /// Pushes the current quote and alarm time to the Android home-screen
@@ -43,6 +44,14 @@ class WidgetSyncService {
     await HomeWidget.saveWidgetData<int>('widget_alarm_hour', config?.hour ?? 0);
     await HomeWidget.saveWidgetData<int>('widget_alarm_minute', config?.minute ?? 0);
     await _updateAll();
+  }
+
+  /// Read by FlipClockDreamService.kt (not an app-widget provider, so this
+  /// skips `_updateAll()` — that only re-triggers `onUpdate` for the
+  /// registered `AppWidgetProvider`s, which a Daydream isn't). It reads
+  /// this once each time the screen saver starts, same as the alarm badge.
+  Future<void> syncDreamBackground(DreamBackgroundId id) async {
+    await HomeWidget.saveWidgetData<String>('widget_dream_background', id.name);
   }
 
   Future<void> _updateAll() async {

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Root fills the whole screen. clock_content wraps its own content
+     (meridiem stacked directly above digit_row — plain document flow, no
+     overlap) and is always shown upright — no rotation, in either
+     orientation. Because meridiem adds height above digit_row,
+     clock_content's own geometric center is NOT the same point as
+     digit_row's center, so FlipClockRenderer.kt nudges clock_content by a
+     plain translation (digit_row's center to the screen's true center)
+     rather than relying on layout_gravity="center" alone, which pins the
+     *digits* to the screen center while AM/PM still sits in its own
+     non-overlapping space above them. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dream_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#141210"
+    android:clipChildren="false">
+
+    <!-- background_container always fills the screen at MATCH_PARENT with
+         no rotation (FlipClockRenderer.kt#resizeBackgroundContainer). -->
+    <FrameLayout
+        android:id="@+id/background_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+
+        <!-- Looping background video (Pixabay Content License,
+             free/rights-free use — res/raw/*.mp4) fills the screen behind
+             everything else; FlipClockDreamService.kt starts it and loops
+             it. TextureView, not VideoView — VideoView is built on
+             SurfaceView, which opens its own separate compositor window
+             that needs the WindowManager to set up correct Z-ordering; a
+             Daydream's window (TYPE_DREAM) doesn't always get that set up
+             correctly, which is what surfaced on-device as "동영상을 재생할
+             수 없습니다" (can't play this video) right as the screen saver
+             started. TextureView renders as an ordinary View inside the
+             normal view hierarchy instead of a separate window, which
+             sidesteps that whole class of problem. -->
+        <TextureView
+            android:id="@+id/dream_background_video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- Darkens the video enough for the clock/AM-PM/alarm text (all
+             designed against the old solid #141210 background) to stay
+             legible over moving footage instead of just the fixed color. -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#59000000" />
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/clock_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <!-- Same convention as the home-screen widgets (widget_small/medium/
+             large.xml): AM/PM is a separate TextView set in English by
+             Kotlin, since Calendar/TextClock's locale-driven "a" always
+             renders "오전/오후" on a Korean device with no way to force
+             English. Directly above digit_row (small marginBottom, plain
+             flow — not overlapping it) and left-aligned with it (default
+             LinearLayout start gravity; digit_row is the widest child so
+             its left edge is clock_content's left edge too). -->
+        <TextView
+            android:id="@+id/dream_meridiem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="AM"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="#C9A360" />
+
+        <LinearLayout
+            android:id="@+id/digit_row"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <com.munjangsigye.munjang_sigye.FlipDigitView
+                android:id="@+id/digit_h1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <com.munjangsigye.munjang_sigye.FlipDigitView
+                android:id="@+id/digit_h2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/colon1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
+                android:text=":"
+                android:textStyle="bold"
+                android:textColor="#C9A360" />
+
+            <com.munjangsigye.munjang_sigye.FlipDigitView
+                android:id="@+id/digit_m1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <com.munjangsigye.munjang_sigye.FlipDigitView
+                android:id="@+id/digit_m2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/colon2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
+                android:text=":"
+                android:textStyle="bold"
+                android:textColor="#C9A360" />
+
+            <com.munjangsigye.munjang_sigye.FlipDigitView
+                android:id="@+id/digit_s1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <com.munjangsigye.munjang_sigye.FlipDigitView
+                android:id="@+id/digit_s2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Independent of clock_content, always top-right, no rotation.
+         Always shown — a plain bell when the alarm is set, a crossed-out
+         bell when it isn't (text set in Kotlin). -->
+    <TextView
+        android:id="@+id/dream_alarm_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginEnd="18dp"
+        android:layout_marginTop="18dp"
+        android:textSize="14sp"
+        android:textColor="#FFFFFF" />
+
+    <!-- Same widget_quote/widget_attribution keys the home-screen widgets
+         (LargeWidgetProvider.kt) already read — set once in
+         FlipClockRenderer.kt#showQuote(), same convention as the alarm
+         badge. Independent of clock_content so the quote never affects the
+         digit-centering math. -->
+    <LinearLayout
+        android:id="@+id/dream_quote_block"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="40dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/dream_quote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:lineSpacingExtra="4dp"
+            android:textSize="15sp"
+            android:textColor="#F2ECE0" />
+
+        <TextView
+            android:id="@+id/dream_attribution"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textSize="12sp"
+            android:textColor="#C9A360" />
+
+    </LinearLayout>
+
+</FrameLayout>

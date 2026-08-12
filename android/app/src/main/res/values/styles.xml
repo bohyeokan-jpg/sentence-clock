@@ -15,4 +15,9 @@
     <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <item name="android:windowBackground">?android:colorBackground</item>
     </style>
+    <!-- DreamPreviewActivity: fullscreen, no title/action bar, dark
+         background behind the clock while it starts up. -->
+    <style name="DreamPreviewTheme" parent="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+        <item name="android:windowBackground">#141210</item>
+    </style>
 </resources>

@@ -4,8 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../model/app_theme.dart';
 import '../model/clock_shape.dart';
+import '../model/dream_background.dart';
+import '../service/dream_channel.dart';
 import '../viewmodel/alarm_provider.dart';
 import '../viewmodel/clock_shape_provider.dart';
+import '../viewmodel/dream_background_provider.dart';
 import '../viewmodel/theme_provider.dart';
 import 'alarm_settings_screen.dart';
 
@@ -17,6 +20,7 @@ class SettingsScreen extends ConsumerWidget {
     final palette = ref.watch(themePaletteProvider);
     final currentId = ref.watch(themeProvider);
     final currentShape = ref.watch(clockShapeProvider);
+    final currentDreamBackground = ref.watch(dreamBackgroundProvider);
     final alarmAsync = ref.watch(alarmProvider);
 
     return Scaffold(
@@ -42,6 +46,7 @@ class SettingsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 10),
             GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const AlarmSettingsScreen()),
               ),
@@ -81,6 +86,87 @@ class SettingsScreen extends ConsumerWidget {
                   ],
                 ),
               ),
+            ),
+            const SizedBox(height: 28),
+            Text(
+              '화면보호기',
+              style: GoogleFonts.notoSansKr(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: palette.ink,
+              ),
+            ),
+            const SizedBox(height: 10),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => dreamChannel.invokeMethod('openDreamSettings'),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  border: Border.all(color: palette.ink.withValues(alpha: 0.15)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.nightlight_round, color: palette.accent, size: 20),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        '충전 중 플립시계 화면보호기 설정하기',
+                        style: GoogleFonts.notoSansKr(fontSize: 12.5, color: palette.ink),
+                      ),
+                    ),
+                    Icon(Icons.chevron_right, color: palette.ink.withValues(alpha: 0.4)),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              '화면보호기 배경',
+              style: GoogleFonts.notoSansKr(
+                fontSize: 12.5,
+                color: palette.ink.withValues(alpha: 0.7),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: DreamBackgroundId.values.map((id) {
+                final option = dreamBackgroundOptions[id]!;
+                final selected = id == currentDreamBackground;
+                return GestureDetector(
+                  // Unselected chips have no fill (color: null below), and
+                  // GestureDetector's default hit-test behavior only
+                  // registers taps where a child actually paints something
+                  // — so most of an unselected chip (its padding/border,
+                  // everywhere except the label glyphs themselves) silently
+                  // ate taps. opaque makes the whole chip tappable
+                  // regardless of fill.
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => ref.read(dreamBackgroundProvider.notifier).select(id),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: selected ? palette.accent.withValues(alpha: 0.15) : null,
+                      border: Border.all(
+                        color: selected ? palette.accent : palette.ink.withValues(alpha: 0.15),
+                        width: selected ? 1.5 : 1,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      option.label,
+                      style: GoogleFonts.notoSansKr(
+                        fontSize: 12.5,
+                        color: selected ? palette.accent : palette.ink,
+                        fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
             const SizedBox(height: 28),
             Text(

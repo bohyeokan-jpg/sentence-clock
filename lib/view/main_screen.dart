@@ -4,8 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../model/app_theme.dart';
 import '../model/clock_shape.dart';
+import '../model/dream_background.dart';
+import '../service/dream_channel.dart';
 import '../viewmodel/alarm_provider.dart';
 import '../viewmodel/clock_shape_provider.dart';
+import '../viewmodel/dream_background_provider.dart';
 import '../viewmodel/quote_provider.dart';
 import '../viewmodel/theme_provider.dart';
 import '../widget/clock_widget.dart';
@@ -60,16 +63,81 @@ class MainScreen extends ConsumerWidget {
             Positioned(
               top: isLandscape ? 4 : 0,
               right: 0,
-              child: IconButton(
-                icon: Icon(Icons.settings_outlined, color: palette.ink.withValues(alpha: 0.55)),
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const SettingsScreen()),
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _DreamBackgroundDropdown(ref: ref, palette: palette),
+                  IconButton(
+                    icon: Icon(Icons.settings_outlined, color: palette.ink.withValues(alpha: 0.55)),
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Lets the user pick which background the preview should run with before
+/// it launches, instead of silently reusing whatever was last chosen in
+/// Settings — picking one here also updates Settings' own selection (same
+/// provider), so the two stay in sync either direction.
+///
+/// A dropdown menu (`PopupMenuButton`) rather than the full-height modal
+/// bottom sheet this used to be — in landscape the screen is only ~360-420px
+/// tall, and the sheet's title + subtitle + 5 options didn't all fit, with
+/// no scrolling to reach the rest. A dropdown sizes itself to the menu's
+/// own content and Flutter keeps it within the screen bounds (scrolling
+/// internally if it still doesn't fit), so it works the same in both
+/// orientations.
+class _DreamBackgroundDropdown extends StatelessWidget {
+  final WidgetRef ref;
+  final AppThemePalette palette;
+
+  const _DreamBackgroundDropdown({required this.ref, required this.palette});
+
+  @override
+  Widget build(BuildContext context) {
+    final current = ref.read(dreamBackgroundProvider);
+    return PopupMenuButton<DreamBackgroundId>(
+      tooltip: '화면보호기 실행',
+      icon: Icon(Icons.play_circle_outline, color: palette.ink.withValues(alpha: 0.55)),
+      color: palette.background,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      itemBuilder: (menuContext) => DreamBackgroundId.values.map((id) {
+        final option = dreamBackgroundOptions[id]!;
+        final selected = id == current;
+        return PopupMenuItem<DreamBackgroundId>(
+          value: id,
+          child: Row(
+            children: [
+              Icon(
+                selected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                size: 18,
+                color: selected ? palette.accent : palette.ink.withValues(alpha: 0.4),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                option.label,
+                style: GoogleFonts.notoSansKr(
+                  fontSize: 14.5,
+                  color: palette.ink,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+      onSelected: (id) {
+        ref.read(dreamBackgroundProvider.notifier).select(id);
+        dreamChannel.invokeMethod('openDreamPreview');
+      },
     );
   }
 }
