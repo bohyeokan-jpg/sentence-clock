@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
+import java.util.Calendar
 
 class SmallWidgetProvider : HomeWidgetProvider() {
     override fun onUpdate(
@@ -19,6 +20,10 @@ class SmallWidgetProvider : HomeWidgetProvider() {
                 setOnClickPendingIntent(
                     R.id.widget_root,
                     HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java),
+                )
+                setTextViewText(
+                    R.id.widget_meridiem,
+                    if (Calendar.getInstance().get(Calendar.AM_PM) == Calendar.AM) "AM" else "PM",
                 )
             }
             appWidgetManager.updateAppWidget(widgetId, views)

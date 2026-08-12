@@ -16,15 +16,35 @@
         android:textSize="10sp"
         android:textColor="#8A6438" />
 
-    <TextClock
-        android:id="@+id/widget_clock"
+    <!-- TextClock's "a" (AM/PM) symbol is locale-driven — see widget_medium/
+         widget_large for the same note. Split into its own TextView (set in
+         English by Kotlin) stacked above the h:mm TextClock, left-aligned,
+         so AM/PM sits at the time's upper-left corner instead of inline. -->
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:format12Hour="a h:mm"
-        android:format24Hour="a h:mm"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="#2B2620" />
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/widget_meridiem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="AM"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#2B2620" />
+
+        <TextClock
+            android:id="@+id/widget_clock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:format12Hour="h:mm"
+            android:format24Hour="h:mm"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#2B2620" />
+
+    </LinearLayout>
 
 </LinearLayout>

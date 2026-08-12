@@ -72,15 +72,16 @@
 
         </FrameLayout>
 
-        <!-- Time section: its own column too, with gravity="center" so the
-             AM/PM + digital time sit in the middle of this section instead
-             of hugging its left edge (which is what happened when this was
-             just a wrap_content block trailing right after the clock).
+        <!-- Time section: its own column too, with gravity="center_vertical|start"
+             so the AM/PM + digital time block sits vertically centered within
+             this section while hugging its left edge — AM/PM stacks above the
+             digital time (vertical orientation, both left-aligned) so it reads
+             as sitting at the time's upper-left corner rather than beside it.
              weight="3.2" (was "2" out of a clock:time ratio of 3:2, i.e.
              this column's own share of the row is now 20% smaller than
              before — 0.32 vs 0.4) shrinks this column itself; the text
-             inside stays its original size, gravity="center" just has
-             less room to center it within now.
+             inside stays its original size, gravity just has less room to
+             center it within now.
              TextClock's "a" (AM/PM) symbol is locale-driven — on a Korean
              device it always renders "오전/오후" no matter what pattern we
              ask for, with no way to force English while it keeps ticking on
@@ -92,15 +93,15 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="3.2"
-            android:gravity="center">
+            android:orientation="vertical"
+            android:gravity="center_vertical|start">
 
             <TextView
                 android:id="@+id/widget_meridiem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="4dp"
                 android:text="AM"
-                android:textSize="27sp"
+                android:textSize="22sp"
                 android:textStyle="bold"
                 android:textColor="#2B2620" />
 
